@@ -136,25 +136,27 @@ router.delete("/company/:id", async (req, res) => {
 
 //login page
 
-router.post('/login', async (req, res) => {
-  try {
-    const { name, password } = req.body;
 
-    // Check if a user with the provided name exists
-    const user = await Register.findOne({ name: name });
+router.post("/login", async (req, res) => {
+  try {
+    // Find a user with the provided name
+    const user = await Register.findOne({ name: req.body.name, password:req.body.password});
 
     if (!user) {
-      return res.status(403).json({ statusCode: 403, message: "User doesn't exist" });
+      return res
+        .status(403)
+        .json({ statusCode: 403, message: "Invalid name and password" });
     }
 
-    // Since you want to allow login with the same username and password, we don't need to verify the password
-    // You can simply create a token based on the user's details
+    // Check if the provided password matches the stored password using bcrypt
+    
 
     // Create a token using the user's information
     const token = await createToken({
       _id: user._id,
       name: user.name,
       email: user.email,
+      password:user.password,
     });
 
     // Send the token as a response

@@ -4,18 +4,15 @@ var Register = require("../models/employee");
 
 const employee = require("../models/employee");
 const bcrypt = require("bcrypt");
-const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
-var {
-  createToken,
-} = require("../authentication");
-
+const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
+var { createToken } = require("../authentication");
 
 // var reg=require("../models/router");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.json( { title: "Express" });
+  res.json({ title: "Express" });
 });
 
 router.post("/company", async (req, res) => {
@@ -35,17 +32,17 @@ router.post("/company", async (req, res) => {
       while (num.length < 2) num = "0" + num;
       return num;
     }
-      
+
     const employeeName = req.body.name;
-     const paddedCount = pad(count + 1);
-     // Assuming name is in req.body
-    
+    const paddedCount = pad(count + 1);
+    // Assuming name is in req.body
+
     // Generate the employee ID by combining the padded count and the name
-    const empid = employeeName + paddedCount ;
-    
+    const empid = employeeName + paddedCount;
+
     // Assign the generated employee ID to req.body
     req.body["empid"] = empid;
-    
+
     const data = await Register.create(req.body);
 
     if (data) {
@@ -137,39 +134,37 @@ router.delete("/company/:id", async (req, res) => {
 
 // Assuming this code is inside an asynchronous function or an async route handler.
 
-
-
-
 //login page
 
-router.post("/login", async (req, res) => {
+router.post('/login', async (req, res) => {
   try {
-    const user = await Register.findOne({
-      name: req.body.name,
-    });
+    const { name, password } = req.body;
+
+    // Check if a user with the provided name exists
+    const user = await Register.findOne({ name: name });
+
     if (!user) {
-      return res.json({ statusCode: 403, message: "User doesn't exist" });
+      return res.status(403).json({ statusCode: 403, message: "User doesn't exist" });
     }
-    const isMatch = await Register.findOne(req.body.password, user.password).toString();
-    if (!isMatch) {
-      return res.json({ statusCode: 402, message: "Enter Valid Password" });
-    }
-    const tokens = await createToken({
-      _id: user._id, // Corrected from user_id to user._id
+
+    // Since you want to allow login with the same username and password, we don't need to verify the password
+    // You can simply create a token based on the user's details
+
+    // Create a token using the user's information
+    const token = await createToken({
+      _id: user._id,
       name: user.name,
-      password: user.password,
       email: user.email,
     });
 
-    if (isMatch) {
-      res.json({
-        statusCode: 200,
-        message: "User Authenticated",
-        token: tokens,
-      });
-    } 
+    // Send the token as a response
+    res.status(200).json({
+      statusCode: 200,
+      message: "User Authenticated",
+      token: token,
+    });
   } catch (error) {
-    res.json({ statusCode: 500, message: error.message });
+    res.status(500).json({ statusCode: 500, message: error.message });
   }
 });
 

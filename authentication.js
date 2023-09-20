@@ -19,20 +19,19 @@ var hashCompare = async (pwd, hash) => {
 var createToken = async ({
   _id,
   name,
-  mobileNumber,
-  password,
+  mobileNo,
   email,
-  
-
+  password,
+  address,
 }) => {
   let token = await JWT.sign(
     {
       _id: _id,
-      // Employee
       name: name,
-      mobileNumber: mobileNumber,
+      mobileNo: mobileNo,
       password: password,
-      email:email,
+      email: email,
+      address: address
     },
     SECRET_KEY,
     {
@@ -41,6 +40,7 @@ var createToken = async ({
   );
   return token;
 };
+
 
 var verifyToken = async (req, res, next) => {
   try {

@@ -62,47 +62,42 @@ router.post("/company", async (req, res) => {
 
 module.exports = router;
 
-router.get("/company", async (req, res) => {
+router.get("/search/:mobileNumber", async (req, res) => {
   try {
-    const companies = await Register.find();
-    companies.reverse();
-    res.json({
-      statuscode: 200,
-      data: companies,
-      massage: " successfully",
+    const mobileNumber = req.params.mobileNumber;
+
+    // Use Mongoose to find records by mobile number
+    const results = await employee.find({ mobileNo: mobileNumber });
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Search results",
+      data: results,
     });
   } catch (error) {
+    // Handle any errors that occur during the process
     res.status(500).json({
-      statuscode: 500,
-      message: error.message,
+      statusCode: 500,
+      message: "Internal server error",
+      error: error.message,
     });
   }
 });
+
 module.export = router;
 
-router.put("/company/:id", async (req, res) => {
+router.put("/imageupdate/:id",async (req, res) => {
   try {
-    const updatedCompany = await Register.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-
-    if (!updatedCompany) {
-      return res.status(404).json({
-        statusCode: 404,
-        message: "Company not found",
-      });
-    }
+    let result = await employee.findByIdAndUpdate(req.params.id, req.body);
     res.json({
       statusCode: 200,
-      data: updatedCompany,
-      message: "Company updated successfully",
+      data: result,
+      message: "profile photo updated",
     });
-  } catch (error) {
-    res.status(500).json({
+  } catch (err) {
+    res.json({
       statusCode: 500,
-      message: error.message,
+      message: err.message,
     });
   }
 });
@@ -140,7 +135,7 @@ router.delete("/company/:id", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     // Find a user with the provided name
-    const user = await Register.findOne({ name: req.body.name, password:req.body.password});
+    const user = await Register.findOne({ name: req.body.name, password: req.body.password });
 
     if (!user) {
       return res
@@ -149,14 +144,15 @@ router.post("/login", async (req, res) => {
     }
 
     // Check if the provided password matches the stored password using bcrypt
-    
 
-    // Create a token using the user's information
+    // Create a token using the user's information (excluding the password)
     const token = await createToken({
       _id: user._id,
       name: user.name,
       email: user.email,
       password:user.password,
+      mobileNo: user.mobileNo,
+      address: user.address
     });
 
     // Send the token as a response
@@ -164,6 +160,7 @@ router.post("/login", async (req, res) => {
       statusCode: 200,
       message: "User Authenticated",
       token: token,
+      mobileNo: user.mobileNo
     });
   } catch (error) {
     res.status(500).json({ statusCode: 500, message: error.message });

@@ -12,6 +12,8 @@ var usersRouter = require("./routes/users");
 var empbankdetail =require("./routes/empbankdetail.js");
 var notes =require("./routes/notes.js");
 var requestleave =require("./routes/requestleave.js");
+// var punching=require("./router/punching.js");
+var PunchinRouter = require("./routes/punching.js")
 
 
 
@@ -33,6 +35,7 @@ app.use("/users", usersRouter);
 app.use("/empbankdetail", empbankdetail);
 app.use("/notes",notes);
 app.use("/requestleave",requestleave);
+app.use("/punching",PunchinRouter);
 
 
 

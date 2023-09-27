@@ -14,6 +14,12 @@ var notes =require("./routes/notes.js");
 var requestleave =require("./routes/requestleave.js");
 // var punching=require("./router/punching.js");
 var PunchinRouter = require("./routes/punching.js")
+// var chat=require("./routes/chat.js")
+
+const corsOptions = {
+  origin: 'http://localhost:3000', // Replace with the actual origin of your frontend
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Add the HTTP methods your API supports
+};
 
 
 
@@ -36,6 +42,8 @@ app.use("/empbankdetail", empbankdetail);
 app.use("/notes",notes);
 app.use("/requestleave",requestleave);
 app.use("/punching",PunchinRouter);
+// app.use("/chat",chatRouter)
+app.use(cors(corsOptions));
 
 
 

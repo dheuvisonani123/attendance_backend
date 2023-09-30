@@ -138,7 +138,9 @@ router.get("/search/:mobileNumber", async (req, res) => {
 
 router.post("/attandance", async (req, res) => {
   try {
+    
     var data = await punching.create(req.body);
+    console.log("data kdslda",data)
     res.json({
       statusCode: 200,
       data: data,
@@ -154,6 +156,86 @@ router.post("/attandance", async (req, res) => {
 
 //get api for
 
+// router.get("/attandance/:mobileNumber/:attendandanceDate", async (req, res) => {
+//   try {
+//     const mobileNumber = req.params.mobileNumber;
+//     const attendandanceDate = req.params.attendandanceDate;
+
+//     // Use Mongoose to find records by mobile number
+//     const punchIn = await punching.findOne({
+//       mobileNo: mobileNumber,
+//       attendandanceDate: attendandanceDate,
+//       status: "Punch in",
+//     });
+//     console.log("attendandanceDate",attendandanceDate)
+    
+//     const punchOut = await punching.findOne({
+//       mobileNo: mobileNumber,
+//       attendandanceDate: attendandanceDate,
+//       status: "Punch out",
+//     });
+
+//     if (punchIn && punchOut) {
+//       // Extract hours, minutes, and seconds from the time strings
+//       const punchInTimeParts = punchIn.attendandanceTime.split(":");
+//       const punchOutTimeParts = punchOut.attendandanceTime.split(":");
+      
+//       const punchInHours = parseInt(punchInTimeParts[0]);
+//       const punchInMinutes = parseInt(punchInTimeParts[1]);
+//       const punchInSeconds = parseInt(punchInTimeParts[2]);
+      
+//       const punchOutHours = parseInt(punchOutTimeParts[0]);
+//       const punchOutMinutes = parseInt(punchOutTimeParts[1]);
+//       const punchOutSeconds = parseInt(punchOutTimeParts[2]);
+
+//       // Calculate hours, minutes, and seconds
+//       const hours = punchOutHours - punchInHours;
+//       const minutes = punchOutMinutes - punchInMinutes;
+//       const seconds = punchOutSeconds - punchInSeconds;
+
+//       // Ensure minutes and seconds are positive
+//       if (seconds < 0) {
+//         minutes -= 1;
+//         seconds += 60;
+//       }
+
+//       if (minutes < 0) {
+//         hours -= 1;
+//         minutes += 60;
+//       }
+
+//       const totalTime = `${hours}:${minutes}:${seconds}`;
+
+//       res.status(200).json({
+//         statusCode: 200,
+//         message: "Search results",
+//         data: {
+//           punchIn: punchIn,
+//           punchOut: punchOut,
+//           totalTime: totalTime,
+//         },
+//       });
+//     } else {
+//       res.status(404).json({
+//         statusCode: 404,
+//         message: "Punch In or Punch Out record not found for the given date and mobile number",
+//       });
+//     }
+//   } catch (error) {
+//     // Handle any errors that occur during the process
+//     res.status(500).json({
+//       statusCode: 500,
+//       message: "Internal server error",
+//       error: error.message,
+//     });
+//   }
+// });
+
+
+
+
+
+
 router.get("/attandance/:mobileNumber/:attendandanceDate", async (req, res) => {
   try {
     const mobileNumber = req.params.mobileNumber;
@@ -165,14 +247,13 @@ router.get("/attandance/:mobileNumber/:attendandanceDate", async (req, res) => {
       attendandanceDate: attendandanceDate,
       status: "Punch in",
     });
-    console.log("attendandanceDate",attendandanceDate)
-    
+console.log("punchIn",punchIn)
     const punchOut = await punching.findOne({
       mobileNo: mobileNumber,
       attendandanceDate: attendandanceDate,
       status: "Punch out",
     });
-
+console.log("punchOut",punchOut)
     if (punchIn && punchOut) {
       // Extract hours, minutes, and seconds from the time strings
       const punchInTimeParts = punchIn.attendandanceTime.split(":");
@@ -203,7 +284,7 @@ router.get("/attandance/:mobileNumber/:attendandanceDate", async (req, res) => {
       }
 
       const totalTime = `${hours}:${minutes}:${seconds}`;
-
+      console.log("totalTime",totalTime)
       res.status(200).json({
         statusCode: 200,
         message: "Search results",
@@ -235,11 +316,31 @@ router.get("/attandance/:mobileNumber/:attendandanceDate", async (req, res) => {
 
 
 
-
-
 //get practice
 
 
+router.get('/punch', async (req, res) => {
+  try {
+    const { fromDate, toDate } = req.body;
+
+    const punches = await Punching.find({
+      dateTime: {
+        $gte: new Date(fromDate), // Filter by fromDate
+        $lte: new Date(toDate),   // Filter by toDate
+      },
+    });
+
+    res.status(200).json({
+      statusCode: 200,
+      data: punches,
+    });
+  } catch (error) {
+    res.status(500).json({
+      statusCode: 500,
+      message: error.message,
+    });
+  }
+});
 
 
 

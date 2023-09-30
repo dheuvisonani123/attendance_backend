@@ -10,11 +10,21 @@ const punching = new Schema({
   // profile:{type:String},
   // status:{type:String}
 
-  punchindate: {type: String},
-  punchoutdate: {type: String},
+ 
   attendandanceTime: {type: String},
+  attendandanceDate:{type:String},
   status: {type: String},
   mobileNo:{type: String},
+  fromDate:{type: String},
+  toDate:{type: String},
+  // date: { type: Date, default: Date.now },
+  date: { type: Date},
+  name:{}
+  
+
+  
+  
+  
   
   
 });

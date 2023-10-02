@@ -319,28 +319,208 @@ console.log("punchOut",punchOut)
 //get practice
 
 
-router.get('/punch', async (req, res) => {
-  try {
-    const { fromDate, toDate } = req.body;
 
-    const punches = await Punching.find({
-      dateTime: {
-        $gte: new Date(fromDate), // Filter by fromDate
-        $lte: new Date(toDate),   // Filter by toDate
+
+
+router.get("/attendance/:mobileNumber/:startDate/:endDate", async (req, res) => {
+  try {
+    const mobileNumber = req.params.mobileNumber;
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+
+    // Use Mongoose to find records within the date range
+    const punchInRecords = await punching.find({
+      mobileNo: mobileNumber,
+      attendandanceDate: {
+        $gte: startDate,
+        $lte: endDate,
       },
+      status: "Punch in",
     });
+
+    const punchOutRecords = await punching.find({
+      mobileNo: mobileNumber,
+      attendandanceDate: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+      status: "Punch out",
+    });
+
+    // Calculate total time for the date range
+    let totalHours = 0;
+    let totalMinutes = 0;
+    let totalSeconds = 0;
+
+    for (let i = 0; i < punchInRecords.length; i++) {
+      const punchIn = punchInRecords[i];
+      const punchOut = punchOutRecords[i];
+
+      // Extract hours, minutes, and seconds from the time strings
+      const punchInTimeParts = punchIn.attendandanceTime.split(":");
+      const punchOutTimeParts = punchOut.attendandanceTime.split(":");
+
+      const punchInHours = parseInt(punchInTimeParts[0]);
+      const punchInMinutes = parseInt(punchInTimeParts[1]);
+      const punchInSeconds = parseInt(punchInTimeParts[2]);
+
+      const punchOutHours = parseInt(punchOutTimeParts[0]);
+      const punchOutMinutes = parseInt(punchOutTimeParts[1]);
+      const punchOutSeconds = parseInt(punchOutTimeParts[2]);
+
+      // Calculate hours, minutes, and seconds for each day
+      const hours = punchOutHours - punchInHours;
+      const minutes = punchOutMinutes - punchInMinutes;
+      const seconds = punchOutSeconds - punchInSeconds;
+
+      // Ensure minutes and seconds are positive
+      if (seconds < 0) {
+        minutes -= 1;
+        seconds += 60;
+      }
+
+      if (minutes < 0) {
+        hours -= 1;
+        minutes += 60;
+      }
+
+      // Add the day's duration to the total
+      totalHours += hours;
+      totalMinutes += minutes;
+      totalSeconds += seconds;
+    }
+
+    // Handle any carryover from seconds and minutes
+    totalMinutes += Math.floor(totalSeconds / 60);
+    totalSeconds = totalSeconds % 60;
+
+    totalHours += Math.floor(totalMinutes / 60);
+    totalMinutes = totalMinutes % 60;
+
+    const totalTime = `${totalHours}:${totalMinutes}:${totalSeconds}`;
 
     res.status(200).json({
       statusCode: 200,
-      data: punches,
+      message: "Search results",
+      data: {
+        totalHours: totalHours,
+        totalMinutes: totalMinutes,
+        totalSeconds: totalSeconds,
+        totalTime: totalTime,
+      },
     });
   } catch (error) {
+    // Handle any errors that occur during the process
     res.status(500).json({
       statusCode: 500,
-      message: error.message,
+      message: "Internal server error",
+      error: error.message,
     });
   }
 });
+
+
+
+
+// router.get("/attendance/:mobileNumber/:startDate/:endDate", async (req, res) => {
+//   try {
+//     const mobileNumber = req.params.mobileNumber;
+//     const startDate = req.params.startDate;
+//     const endDate = req.params.endDate;
+
+//     // Use Mongoose to find records within the date range
+//     const punchInRecords = await punching.find({
+//       mobileNo: mobileNumber,
+//       attendandanceDate: {
+//         $gte: startDate,
+//         $lte: endDate,
+//       },
+//       status: "Punch in",
+//     });
+
+//     const punchOutRecords = await punching.find({
+//       mobileNo: mobileNumber,
+//       attendandanceDate: {
+//         $gte: startDate,
+//         $lte: endDate,
+//       },
+//       status: "Punch out",
+//     });
+
+//     // Calculate total time and total days for the date range
+//     let totalHours = 0;
+//     let totalMinutes = 0;
+//     let totalSeconds = 0;
+//     let totalDays = 0;
+
+//     for (let i = 0; i < punchInRecords.length; i++) {
+//       const punchIn = punchInRecords[i];
+//       const punchOut = punchOutRecords[i];
+
+//       // Extract hours, minutes, and seconds from the time strings
+//       const punchInTimeParts = punchIn.attendandanceTime.split(":");
+//       const punchOutTimeParts = punchOut.attendandanceTime.split(":");
+
+//       const punchInHours = parseInt(punchInTimeParts[0]);
+//       const punchInMinutes = parseInt(punchInTimeParts[1]);
+//       const punchInSeconds = parseInt(punchInTimeParts[2]);
+
+//       const punchOutHours = parseInt(punchOutTimeParts[0]);
+//       const punchOutMinutes = parseInt(punchOutTimeParts[1]);
+//       const punchOutSeconds = parseInt(punchOutTimeParts[2]);
+
+//       // Calculate hours, minutes, and seconds for each day
+//       const hours = punchOutHours - punchInHours;
+//       const minutes = punchOutMinutes - punchInMinutes;
+//       const seconds = punchOutSeconds - punchInSeconds;
+
+//       // Ensure minutes and seconds are positive
+//       if (seconds < 0) {
+//         minutes -= 1;
+//         seconds += 60;
+//       }
+
+//       if (minutes < 0) {
+//         hours -= 1;
+//         minutes += 60;
+//       }
+
+//       // Add the day's duration to the total
+//       totalHours += hours;
+//       totalMinutes += minutes;
+//       totalSeconds += seconds;
+//       totalDays += 1; // Increment the total days
+//     }
+
+//     // Handle any carryover from seconds and minutes
+//     totalMinutes += Math.floor(totalSeconds / 60);
+//     totalSeconds = totalSeconds % 60;
+
+//     totalHours += Math.floor(totalMinutes / 60);
+//     totalMinutes = totalMinutes % 60;
+
+//     const totalTime = `${totalHours}:${totalMinutes}:${totalSeconds}`;
+
+//     res.status(200).json({
+//       statusCode: 200,
+//       message: "Search results",
+//       data: {
+//         totalHours: totalHours,
+//         totalMinutes: totalMinutes,
+//         totalSeconds: totalSeconds,
+//         totalTime: totalTime,
+//         totalDays: totalDays,
+//       },
+//     });
+//   } catch (error) {
+//     // Handle any errors that occur during the process
+//     res.status(500).json({
+//       statusCode: 500,
+//       message: "Internal server error",
+//       error: error.message,
+//     });
+//   }
+// });
 
 
 

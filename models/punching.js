@@ -12,7 +12,7 @@ const punching = new Schema({
 
  
   attendandanceTime: {type: String},
-  attendandanceDate:{type:String},
+  attendandanceDate:{type:Date},
   status: {type: String},
   mobileNo:{type: String},
   fromDate:{type: String},

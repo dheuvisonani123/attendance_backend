@@ -4,6 +4,9 @@ mongoose.Promise = global.Promise;
 mongoose
   .connect(
     "mongodb+srv://shivamshukla:shivamshukla123@shivamshukla.iozmxlc.mongodb.net/pro"
+    
+    
+
   )
   .then(() => console.log("connection successful"))
   .catch((err) => console.error("MongoDB Error", err));

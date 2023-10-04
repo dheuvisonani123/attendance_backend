@@ -17,14 +17,14 @@ router.get("/", function (req, res, next) {
 
 router.post("/company", async (req, res) => {
   try {
-    const user = await Register.findOne({
+    const user = await Register.create({
       name: req.body.name,
     });
-    if (user) {
-      return res
-        .status(400)
-        .send({ statusCode: 403, message: "name already in use" });
-    }
+    // if (user) {
+    //   return res
+    //     .status(400)
+    //     .send({ statusCode: 403, message: "name already in use" });
+    // }
 
     var count = await employee.count();
     function pad(num) {
@@ -168,3 +168,32 @@ router.post("/login", async (req, res) => {
 });
 
 module.exports = router;
+
+
+
+
+//get user 
+
+// Assuming you have an "employee" model defined using Mongoose
+
+router.get("/employeedate", async (req, res) => {
+  try {
+   
+    const results = await employee.find();
+console.log("results",results)
+    res.status(200).json({
+      statusCode: 200,
+      message: "Search results",
+      data: results,
+    });
+  } catch (error) {
+    // Handle any errors that occur during the process
+    res.status(500).json({
+      statusCode: 500,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+
+module.export = router;

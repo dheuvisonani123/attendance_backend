@@ -89,6 +89,7 @@ module.export = router;
 router.put("/imageupdate/:id",async (req, res) => {
   try {
     let result = await employee.findByIdAndUpdate(req.params.id, req.body);
+    console.log(result,"result")
     res.json({
       statusCode: 200,
       data: result,
@@ -102,29 +103,29 @@ router.put("/imageupdate/:id",async (req, res) => {
   }
 });
 
-router.delete("/company/:id", async (req, res) => {
-  try {
-    const deletedCompany = await Register.findByIdAndRemove(req.params.id);
+// router.delete("/company/:id", async (req, res) => {
+//   try {
+//     const deletedCompany = await Register.findByIdAndRemove(req.params.id);
 
-    if (!deletedCompany) {
-      return res.status(404).json({
-        statusCode: 404,
-        message: "Company not found",
-      });
-    }
+//     if (!deletedCompany) {
+//       return res.status(404).json({
+//         statusCode: 404,
+//         message: "Company not found",
+//       });
+//     }
 
-    res.json({
-      statusCode: 200,
-      data: deletedCompany,
-      message: "Company deleted successfully",
-    });
-  } catch (error) {
-    res.status(500).json({
-      statusCode: 500,
-      message: error.message,
-    });
-  }
-});
+//     res.json({
+//       statusCode: 200,
+//       data: deletedCompany,
+//       message: "Company deleted successfully",
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       statusCode: 500,
+//       message: error.message,
+//     });
+//   }
+// });
 //autoid generate
 
 // Assuming this code is inside an asynchronous function or an async route handler.
@@ -192,6 +193,68 @@ console.log("results",results)
       statusCode: 500,
       message: "Internal server error",
       error: error.message,
+    });
+  }
+});
+
+
+//update user
+router.put("/company/:empid", async (req, res) => {
+  try {
+    const empid = req.params.empid;
+    const updateData = req.body;
+
+    // Update the user data based on the empid
+    const updatedUser = await employee.findOneAndUpdate({ empid }, updateData, {
+      new: true
+    });
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        statusCode: 404,
+        message: "User not found"
+      });
+    }
+
+    res.json({
+      statusCode: 200,
+      data: updatedUser,
+      message: "User data updated successfully"
+    });
+  } catch (error) {
+    res.status(500).json({
+      statusCode: 500,
+      message: error.message
+    });
+  }
+});
+
+
+
+
+router.delete("/company/:empid", async (req, res) => {
+  try {
+    const empid = req.params.empid;
+
+    // Find and delete the employee by empid
+    const deletedEmployee = await employee.findOneAndRemove({ empid });
+
+    if (!deletedEmployee) {
+      return res.status(404).json({
+        statusCode: 404,
+        message: "Employee not found"
+      });
+    }
+
+    res.json({
+      statusCode: 200,
+      data: deletedEmployee,
+      message: "Employee deleted successfully"
+    });
+  } catch (error) {
+    res.status(500).json({
+      statusCode: 500,
+      message: error.message
     });
   }
 });

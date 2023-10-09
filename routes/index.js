@@ -259,4 +259,7 @@ router.delete("/company/:empid", async (req, res) => {
   }
 });
 
+
+
+
 module.export = router;

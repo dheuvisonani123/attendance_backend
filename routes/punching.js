@@ -161,80 +161,80 @@ router.post("/attandance", async (req, res) => {
 
 
 
-// router.get("/attandance/:mobileNumber/:attendandanceDate", async (req, res) => {
-//   try {
-//     const mobileNumber = req.params.mobileNumber;
-//     const attendandanceDate = req.params.attendandanceDate;
+router.get("/attandance/:mobileNumber/:attendandanceDate", async (req, res) => {
+  try {
+    const mobileNumber = req.params.mobileNumber;
+    const attendandanceDate = req.params.attendandanceDate;
 
-//     // Use Mongoose to find records by mobile number
-//     const punchIn = await punching.findOne({
-//       mobileNo: mobileNumber,
-//       attendandanceDate: attendandanceDate,
-//       status: "Punch in",
-//     });
-//     console.log("punchIn",punchIn)
-// console.log("punchIn",punchIn)
-//     const punchOut = await punching.findOne({
-//       mobileNo: mobileNumber,
-//       attendandanceDate: attendandanceDate,
-//       status: "Punch out",
-//     });
-// console.log("punchOut",punchOut)
-//     if (punchIn && punchOut) {
-//       // Extract hours, minutes, and seconds from the time strings
-//       const punchInTimeParts = punchIn.attendandanceTime.split(":");
-//       const punchOutTimeParts = punchOut.attendandanceTime.split(":");
+    // Use Mongoose to find records by mobile number
+    const punchIn = await punching.findOne({
+      mobileNo: mobileNumber,
+      attendandanceDate: attendandanceDate,
+      status: "Punch in",
+    });
+    console.log("punchIn",punchIn)
+console.log("punchIn",punchIn)
+    const punchOut = await punching.findOne({
+      mobileNo: mobileNumber,
+      attendandanceDate: attendandanceDate,
+      status: "Punch out",
+    });
+console.log("punchOut",punchOut)
+    if (punchIn && punchOut) {
+      // Extract hours, minutes, and seconds from the time strings
+      const punchInTimeParts = punchIn.attendandanceTime.split(":");
+      const punchOutTimeParts = punchOut.attendandanceTime.split(":");
       
-//       const punchInHours = parseInt(punchInTimeParts[0]);
-//       const punchInMinutes = parseInt(punchInTimeParts[1]);
-//       const punchInSeconds = parseInt(punchInTimeParts[2]);
+      const punchInHours = parseInt(punchInTimeParts[0]);
+      const punchInMinutes = parseInt(punchInTimeParts[1]);
+      const punchInSeconds = parseInt(punchInTimeParts[2]);
       
-//       const punchOutHours = parseInt(punchOutTimeParts[0]);
-//       const punchOutMinutes = parseInt(punchOutTimeParts[1]);
-//       const punchOutSeconds = parseInt(punchOutTimeParts[2]);
+      const punchOutHours = parseInt(punchOutTimeParts[0]);
+      const punchOutMinutes = parseInt(punchOutTimeParts[1]);
+      const punchOutSeconds = parseInt(punchOutTimeParts[2]);
 
-//       // Calculate hours, minutes, and seconds
-//       const hours = punchOutHours - punchInHours;
-//       const minutes = punchOutMinutes - punchInMinutes;
-//       const seconds = punchOutSeconds - punchInSeconds;
+      // Calculate hours, minutes, and seconds
+      const hours = punchOutHours - punchInHours;
+      const minutes = punchOutMinutes - punchInMinutes;
+      const seconds = punchOutSeconds - punchInSeconds;
 
-//       // Ensure minutes and seconds are positive
-//       if (seconds < 0) {
-//         minutes -= 1;
-//         seconds += 60;
-//       }
+      // Ensure minutes and seconds are positive
+      if (seconds < 0) {
+        minutes -= 1;
+        seconds += 60;
+      }
 
-//       if (minutes < 0) {
-//         hours -= 1;
-//         minutes += 60;
-//       }
+      if (minutes < 0) {
+        hours -= 1;
+        minutes += 60;
+      }
 
-//       const totalTime = `${hours}:${minutes}:${seconds}`;
-//       console.log("totalTime",totalTime)
-//       res.status(200).json({
-//         statusCode: 200,
-//         message: "Search results",
-//         data: {
-//           punchIn: punchIn,
-//           punchOut: punchOut,
-//           totalTime: totalTime,
-//         },
-//       });
-//     } else {
-//       res.status(404).json({
-//         statusCode: 404,
-//         message: "Punch In or Punch Out record not found for the given date and mobile number",
-//       });
-//     }
-//   } catch (error) {
-//     // Handle any errors that occur during the process
-//     res.status(500).json({
-//       statusCode: 500,
-//       message: "Internal server error",
-//       error: error.message,
-//     });
-//   }
-// });
+      const totalTime = `${hours}:${minutes}:${seconds}`;
+      console.log("totalTime",totalTime)
+      res.status(200).json({
+        statusCode: 200,
+        message: "Search results",
+        data: {
+          punchIn: punchIn,
+          punchOut: punchOut,
+          totalTime: totalTime,
+        },
+      });
+    } else {
+      res.status(404).json({
+        statusCode: 404,
+        message: "Punch In or Punch Out record not found for the given date and mobile number",
+      });
+    }
+  } catch (error) {
+    // Handle any errors that occur during the process
+    res.status(500).json({
+      statusCode: 500,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
 
 
 
@@ -351,90 +351,93 @@ router.post("/attandance", async (req, res) => {
 // });
 
 
-router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
-  try {
-    const mobileNumber = req.params.mobileNumber;
-    const fromDate = new Date(req.params.fromDate);
-    const toDate = new Date(req.params.toDate);
+// router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
+//   try {
+//     const mobileNumber = req.params.mobileNumber;
+//     const fromDate = new Date(req.params.fromDate);
+//     const toDate = new Date(req.params.toDate);
 
-    // Find all "Punch in" and "Punch out" records for the mobile number and date range
-    const records = await Punching.find({
-      mobileNo: mobileNumber,
-      attendandanceDate: {
-        $gte: fromDate,
-        $lte: toDate,
-      },
-    }).sort({ attendandanceDate: 1 }); // Sort records by date in ascending order
+//     // Find all "Punch in" and "Punch out" records for the mobile number and date range
+//     const records = await Punching.find({
+//       mobileNo: mobileNumber,
+//       attendandanceDate: {
+//         $gte: fromDate,
+//         $lte: toDate,
+//       },
+//     }).sort({ attendandanceDate: 1 }); // Sort records by date in ascending order
 
-    // Calculate daily time differences
-    const dailyTimeDifferences = [];
-    let currentDay = null;
-    let punchInTime = null;
+//     // Calculate daily time differences
+//     const dailyTimeDifferences = [];
+//     let currentDay = null;
+//     let punchInTime = null;
 
-    for (const record of records) {
-      const recordDate = record.attendandanceDate;
-      const recordTime = record.attendandanceTime;
-      const status = record.status;
+//     for (const record of records) {
+//       const recordDate = record.attendandanceDate;
+//       const recordTime = record.attendandanceTime;
+//       const status = record.status;
 
-      if (currentDay !== recordDate.toISOString().slice(0, 10)) {
-        // New day, calculate and store the previous day's time difference
-        if (currentDay && punchInTime) {
-          const punchOutTime = new Date(currentDay + "T" + recordTime);
-          const timeDifferenceMilliseconds = punchOutTime - punchInTime;
-          const hours = Math.floor(timeDifferenceMilliseconds / 3600000);
-          const minutes = Math.floor((timeDifferenceMilliseconds % 3600000) / 60000);
-          dailyTimeDifferences.push({
-            day: currentDay,
-            timeDifference: `${hours} hours and ${minutes} minutes`,
-          });
-        }
+//       if (currentDay !== recordDate.toISOString().slice(0, 10)) {
+//         // New day, calculate and store the previous day's time difference
+//         if (currentDay && punchInTime) {
+//           const punchOutTime = new Date(currentDay + "T" + recordTime);
+//           const timeDifferenceMilliseconds = punchOutTime - punchInTime;
+//           const hours = Math.floor(timeDifferenceMilliseconds / 3600000);
+//           const minutes = Math.floor((timeDifferenceMilliseconds % 3600000) / 60000);
+//           dailyTimeDifferences.push({
+//             day: currentDay,
+//             timeDifference: `${hours} hours and ${minutes} minutes`,
+//           });
+//         }
 
-        // Set the current day and punch in time for the new day
-        currentDay = recordDate.toISOString().slice(0, 10);
-        punchInTime = new Date(currentDay + "T" + recordTime);
-      } else if (status === "Punch out" && punchInTime) {
-        // Punch out on the same day, calculate and store the time difference
-        const punchOutTime = new Date(currentDay + "T" + recordTime);
-        const timeDifferenceMilliseconds = punchOutTime - punchInTime;
-        const hours = Math.floor(timeDifferenceMilliseconds / 3600000);
-        const minutes = Math.floor((timeDifferenceMilliseconds % 3600000) / 60000);
-        dailyTimeDifferences.push({
-          day: currentDay,
-          timeDifference: `${hours} hours and ${minutes} minutes`,
-        });
-        punchInTime = null; // Reset punch in time
-      }
-    }
+//         // Set the current day and punch in time for the new day
+//         currentDay = recordDate.toISOString().slice(0, 10);
+//         punchInTime = new Date(currentDay + "T" + recordTime);
+//       } else if (status === "Punch out" && punchInTime) {
+//         // Punch out on the same day, calculate and store the time difference
+//         const punchOutTime = new Date(currentDay + "T" + recordTime);
+//         const timeDifferenceMilliseconds = punchOutTime - punchInTime;
+//         const hours = Math.floor(timeDifferenceMilliseconds / 3600000);
+//         const minutes = Math.floor((timeDifferenceMilliseconds % 3600000) / 60000);
+//         dailyTimeDifferences.push({
+//           day: currentDay,
+//           timeDifference: `${hours} hours and ${minutes} minutes`,
+//         });
+//         punchInTime = null; // Reset punch in time
+//       }
+//     }
 
-    // Calculate the total time
-    const totalMillisecondsSum = dailyTimeDifferences.reduce((sum, record) => {
-      const [hours, minutes] = record.timeDifference
-        .split(' ')[0]
-        .split(' hours and ')
-        .map((value) => parseInt(value));
-      return sum + hours * 3600000 + minutes * 60000;
-    }, 0);
+//     // Calculate the total time
+//     const totalMillisecondsSum = dailyTimeDifferences.reduce((sum, record) => {
+//       const [hours, minutes] = record.timeDifference
+//         .split(' ')[0]
+//         .split(' hours and ')
+//         .map((value) => parseInt(value));
+//       return sum + hours * 3600000 + minutes * 60000;
+//     }, 0);
 
-    const totalHours = Math.floor(totalMillisecondsSum / 3600000);
-    const totalMinutes = Math.floor((totalMillisecondsSum % 3600000) / 60000);
+//     const totalHours = Math.floor(totalMillisecondsSum / 3600000);
+//     const totalMinutes = Math.floor((totalMillisecondsSum % 3600000) / 60000);
 
-    res.status(200).json({
-      statusCode: 200,
-      message: "Daily Time Differences",
-      data: {
-        dailyTimeDifferences,
-        total: `${totalHours} hours and ${totalMinutes} minutes`,
-      },
-    });
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({
-      statusCode: 500,
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
-});
+//     res.status(200).json({
+//       statusCode: 200,
+//       message: "Daily Time Differences",
+//       data: {
+//         dailyTimeDifferences,
+//         total: `${totalHours} hours and ${totalMinutes} minutes`,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Error:", error);
+//     res.status(500).json({
+//       statusCode: 500,
+//       message: "Internal server error",
+//       error: error.message,
+//     });
+//   }
+// });
+
+
+
 
 
 

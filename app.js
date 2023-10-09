@@ -14,7 +14,7 @@ var notes =require("./routes/notes.js");
 var requestleave =require("./routes/requestleave.js");
 // var punching=require("./router/punching.js");
 var PunchinRouter = require("./routes/punching.js")
-// var chat=require("./routes/chat.js")
+var ChatRouter=require("./routes/chats.js")
 
 const corsOptions = {
   origin: 'http://localhost:3000', // Replace with the actual origin of your frontend
@@ -42,7 +42,7 @@ app.use("/empbankdetail", empbankdetail);
 app.use("/notes",notes);
 app.use("/requestleave",requestleave);
 app.use("/punching",PunchinRouter);
-// app.use("/chat",chatRouter)
+app.use("/chats",ChatRouter)
 app.use(cors(corsOptions));
 
 

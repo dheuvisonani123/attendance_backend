@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const requestleave = new Schema({
   fromdate: { type: String },
   todate:{type:String},
-  casualleave:{type:String},
+  leavetype:{type:String},
   reasonofleave:{type:String},
 
   

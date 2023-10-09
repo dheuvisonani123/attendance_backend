@@ -17,15 +17,6 @@ router.get("/", function (req, res, next) {
 
 router.post("/company", async (req, res) => {
   try {
-    const user = await Register.create({
-      name: req.body.name,
-    });
-    // if (user) {
-    //   return res
-    //     .status(400)
-    //     .send({ statusCode: 403, message: "name already in use" });
-    // }
-
     var count = await employee.count();
     function pad(num) {
       num = num.toString();
@@ -53,12 +44,13 @@ router.post("/company", async (req, res) => {
       });
     }
   } catch (error) {
-    res.json({
+    res.status(500).json({
       statusCode: 500,
       message: error.message,
     });
   }
 });
+
 
 module.exports = router;
 

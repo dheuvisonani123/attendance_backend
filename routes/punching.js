@@ -316,7 +316,7 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
       console.log('getTimeDiff', `${hours}:${minutes}:${seconds}`)
       return { hours, minutes, seconds };
     }
-
+// it's work properly
     for(var i = 0 ; i < records.length ; i+=2) {
       const recordDate = records[i].attendandanceDate;
       const recordTime = records[i].attendandanceTime;

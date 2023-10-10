@@ -259,110 +259,110 @@ router.post("/attandance", async (req, res) => {
 
 
 
-// router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
-//   try {
-//     const mobileNumber = req.params.mobileNumber;
-//     const fromDate = new Date(req.params.fromDate);
-//     const toDate = new Date(req.params.toDate);
+router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
+  try {
+    const mobileNumber = req.params.mobileNumber;
+    const fromDate = new Date(req.params.fromDate);
+    const toDate = new Date(req.params.toDate);
 
-//     // Find all "Punch in" and "Punch out" records for the mobile number and date range
-//     const records = await Punching.find({
-//       mobileNo: mobileNumber,
-//       attendandanceDate: {
-//         $gte: fromDate,
-//         $lte: toDate,
-//       },
-//     }).sort({ attendandanceDate: 1 }); // Sort records by date in ascending order
-//     console.log('records',records)
+    // Find all "Punch in" and "Punch out" records for the mobile number and date range
+    const records = await Punching.find({
+      mobileNo: mobileNumber,
+      attendandanceDate: {
+        $gte: fromDate,
+        $lte: toDate,
+      },
+    }).sort({ attendandanceDate: 1 }); // Sort records by date in ascending order
+    console.log('records',records)
 
-//     // Calculate daily time differences
-//     const dailyTimeDifferences = [];
-//     let currentDay = null;
-//     let punchInTime = null;
+    // Calculate daily time differences
+    const dailyTimeDifferences = [];
+    let currentDay = null;
+    let punchInTime = null;
 
     
-//     let totalHours = 0;
-//     let totalMinutes = 0;
-//     let totalSeconds = 0;
+    let totalHours = 0;
+    let totalMinutes = 0;
+    let totalSeconds = 0;
     
-//     const getTimeDiffrence = (fromtime,totime) => {
-//       const punchInTimeParts = fromtime.split(":");
-//       const punchOutTimeParts = totime.split(":");
+    const getTimeDiffrence = (fromtime,totime) => {
+      const punchInTimeParts = fromtime.split(":");
+      const punchOutTimeParts = totime.split(":");
       
-//       const punchInHours = parseInt(punchInTimeParts[0]);
-//       const punchInMinutes = parseInt(punchInTimeParts[1]);
-//       const punchInSeconds = parseInt(punchInTimeParts[2]);
+      const punchInHours = parseInt(punchInTimeParts[0]);
+      const punchInMinutes = parseInt(punchInTimeParts[1]);
+      const punchInSeconds = parseInt(punchInTimeParts[2]);
       
-//       const punchOutHours = parseInt(punchOutTimeParts[0]);
-//       const punchOutMinutes = parseInt(punchOutTimeParts[1]);
-//       const punchOutSeconds = parseInt(punchOutTimeParts[2]);
+      const punchOutHours = parseInt(punchOutTimeParts[0]);
+      const punchOutMinutes = parseInt(punchOutTimeParts[1]);
+      const punchOutSeconds = parseInt(punchOutTimeParts[2]);
 
-//       // Calculate hours, minutes, and seconds
-//       const hours = punchOutHours - punchInHours;
-//       const minutes = punchOutMinutes - punchInMinutes;
-//       const seconds = punchOutSeconds - punchInSeconds;
+      // Calculate hours, minutes, and seconds
+      const hours = punchOutHours - punchInHours;
+      const minutes = punchOutMinutes - punchInMinutes;
+      const seconds = punchOutSeconds - punchInSeconds;
 
-//       // Ensure minutes and seconds are positive
-//       if (seconds < 0) {
-//         minutes -= 1;
-//         seconds += 60;
-//       }
+      // Ensure minutes and seconds are positive
+      if (seconds < 0) {
+        minutes -= 1;
+        seconds += 60;
+      }
 
-//       if (minutes < 0) {
-//         hours -= 1;
-//         minutes += 60;
-//       }
+      if (minutes < 0) {
+        hours -= 1;
+        minutes += 60;
+      }
 
-//       console.log('getTimeDiff', `${hours}:${minutes}:${seconds}`)
-//       return { hours, minutes, seconds };
-//     }
-// // it's work properly
-//     for(var i = 0 ; i < records.length ; i+=2) {
-//       const recordDate = records[i].attendandanceDate;
-//       const recordTime = records[i].attendandanceTime;
-//       const status = records[i].status;
-//       console.log(status === 'Punch in' , records[i+1].status === 'Punch out' , records[i+1].attendandanceDate.toString().slice(0,10) === recordDate.toString().slice(0,10), records[i+1].attendandanceDate, recordDate )
-//       if(status === 'Punch in' && records[i+1].status === 'Punch out' && records[i+1].attendandanceDate.toString().slice(0,10) === recordDate.toString().slice(0,10) ){
-//         const timeDiffrence = getTimeDiffrence(recordTime, records[i+1].attendandanceTime);
-//         totalHours += timeDiffrence.hours;
-//         totalMinutes += timeDiffrence.minutes;
-//         totalSeconds += timeDiffrence.seconds;
-//       }
-//     }
+      console.log('getTimeDiff', `${hours}:${minutes}:${seconds}`)
+      return { hours, minutes, seconds };
+    }
+// it's work properly
+    for(var i = 0 ; i < records.length ; i+=2) {
+      const recordDate = records[i].attendandanceDate;
+      const recordTime = records[i].attendandanceTime;
+      const status = records[i].status;
+      console.log(status === 'Punch in' , records[i+1].status === 'Punch out' , records[i+1].attendandanceDate.toString().slice(0,10) === recordDate.toString().slice(0,10), records[i+1].attendandanceDate, recordDate )
+      if(status === 'Punch in' && records[i+1].status === 'Punch out' && records[i+1].attendandanceDate.toString().slice(0,10) === recordDate.toString().slice(0,10) ){
+        const timeDiffrence = getTimeDiffrence(recordTime, records[i+1].attendandanceTime);
+        totalHours += timeDiffrence.hours;
+        totalMinutes += timeDiffrence.minutes;
+        totalSeconds += timeDiffrence.seconds;
+      }
+    }
 
-//     if(totalSeconds >= 60) {
-//       totalMinutes += Math.floor(totalSeconds / 60);
-//       totalSeconds = totalSeconds % 60;
-//     }
-//     if(totalMinutes >= 60) {
-//       totalHours += Math.floor(totalMinutes / 60);
-//       totalMinutes = totalMinutes % 60;
-//     }
+    if(totalSeconds >= 60) {
+      totalMinutes += Math.floor(totalSeconds / 60);
+      totalSeconds = totalSeconds % 60;
+    }
+    if(totalMinutes >= 60) {
+      totalHours += Math.floor(totalMinutes / 60);
+      totalMinutes = totalMinutes % 60;
+    }
 
     
 
-//     console.log('totalHour', totalHours)
-//     console.log('totalMinutes', totalMinutes)
-//     console.log('totalSeconds', totalSeconds)
+    console.log('totalHour', totalHours)
+    console.log('totalMinutes', totalMinutes)
+    console.log('totalSeconds', totalSeconds)
 
 
-//     res.status(200).json({
-//       statusCode: 200,
-//       message: "Daily Time Differences",
-//       data: {
-//         dailyTimeDifferences,
-//         total: `${totalHours} hours and ${totalMinutes} minutes`,
-//       },
-//     });
-//   } catch (error) {
-//     console.error("Error:", error);
-//     res.status(500).json({
-//       statusCode: 500,
-//       message: "Internal server error",
-//       error: error.message,
-//     });
-//   }
-// });
+    res.status(200).json({
+      statusCode: 200,
+      message: "Daily Time Differences",
+      data: {
+        dailyTimeDifferences,
+        total: `${totalHours} hours and ${totalMinutes} minutes`,
+      },
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
 
 
 

@@ -19,6 +19,7 @@ var HolidaysRouter = require("./routes/holiday.js");
 const corsOptions = {
   origin: "https://attendance-backend-dr959e53v-dheuvisonani123.vercel.app/", // Replace with the actual origin of your frontend
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE", // Add the HTTP methods your API supports
+  credentials: true
 };
 
 var app = express();

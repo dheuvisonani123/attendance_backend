@@ -6,22 +6,20 @@ var logger = require("morgan");
 var cors = require("cors");
 var dbCollation = require("./db.js");
 
-
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
-var empbankdetail =require("./routes/empbankdetail.js");
-var notes =require("./routes/notes.js");
-var requestleave =require("./routes/requestleave.js");
+var empbankdetail = require("./routes/empbankdetail.js");
+var notes = require("./routes/notes.js");
+var requestleave = require("./routes/requestleave.JS");
 // var punching=require("./router/punching.js");
-var PunchinRouter = require("./routes/punching.js")
-var ChatRouter=require("./routes/chats.js")
+var PunchinRouter = require("./routes/punching.js");
+var ChatRouter = require("./routes/chats.js");
+var HolidaysRouter = require("./routes/holiday.js");
 
 const corsOptions = {
-  origin: 'http://localhost:3000', // Replace with the actual origin of your frontend
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Add the HTTP methods your API supports
+  origin: "http://localhost:3000", // Replace with the actual origin of your frontend
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE", // Add the HTTP methods your API supports
 };
-
-
 
 var app = express();
 
@@ -39,13 +37,12 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/empbankdetail", empbankdetail);
-app.use("/notes",notes);
-app.use("/requestleave",requestleave);
-app.use("/punching",PunchinRouter);
-app.use("/chats",ChatRouter)
+app.use("/notes", notes);
+app.use("/requestleave", requestleave);
+app.use("/punching", PunchinRouter);
+app.use("/chats", ChatRouter);
+app.use("/holiday", HolidaysRouter);
 app.use(cors(corsOptions));
-
-
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -63,4 +60,4 @@ app.use(function (err, req, res, next) {
   res.render("error");
 });
 
-module.exports = app;
+module.exports = app;

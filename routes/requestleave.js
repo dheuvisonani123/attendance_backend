@@ -6,14 +6,14 @@ const RequestLeave = require("../models/requestleave");
 router.post("/requestleave", async (req, res) => {
   try {
     // Extract the leave request data from the request body
-    const { fromedate, todate, leavetype, reasonofleave } = req.body;
+    const { fromdate, todate, leavetype, reasonofleave } = req.body;
 
     // Create a new leave request using the RequestLeave model
     const newLeaveRequest = new RequestLeave({
-      fromedate,
+      fromdate,
       todate,
-      reasonofleave,
       leavetype,
+      reasonofleave,
     });
 
     // Save the new leave request to the database
@@ -34,4 +34,25 @@ router.post("/requestleave", async (req, res) => {
   }
 });
 
+
+
+router.get("/getleave", async (req, res) => {
+  try {
+    // Fetch all leave requests from the database
+    const leaveRequests = await RequestLeave.find();
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Leave requests fetched successfully",
+      leaveRequests: leaveRequests,
+    });
+  } catch (error) {
+    // Handle any errors that occur during the process
+    res.status(500).json({
+      statusCode: 500,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
 module.exports = router;

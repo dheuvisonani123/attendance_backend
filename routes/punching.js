@@ -321,7 +321,7 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
       const recordDate = records[i].attendandanceDate;
       const recordTime = records[i].attendandanceTime;
       const status = records[i].status;
-      console.log(status === 'Punch in' , records[i+1].status === 'Punch out' , records[i+1].attendandanceDate.toString().slice(0,10) === recordDate.toString().slice(0,10), records[i+1].attendandanceDate, recordDate )
+   
       if(status === 'Punch in' && records[i+1].status === 'Punch out' && records[i+1].attendandanceDate.toString().slice(0,10) === recordDate.toString().slice(0,10) ){
         const timeDiffrence = getTimeDiffrence(recordTime, records[i+1].attendandanceTime);
         totalHours += timeDiffrence.hours;

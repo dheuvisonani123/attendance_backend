@@ -3,7 +3,7 @@ const router = express.Router();
 const Punching = require("../models/punching");
 const punching = require("../models/punching");
 
-// router.post("/punching", async (req, res) => {
+
 //   try {
 //     const { punchingdate, punchingtime, mobileNo,punchouttime,punchoutdate} = req.body;
 
@@ -88,7 +88,7 @@ router.get("/search/:mobileNumber", async (req, res) => {
   }
 });
 
-// router.get("/calculateTime/:mobileNo", async (req, res) => {
+
 //   try {
 //     const mobileNo = req.params.mobileNo;
 
@@ -243,22 +243,6 @@ router.post("/attandance", async (req, res) => {
 
 //get practice
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
   try {
     const mobileNumber = req.params.mobileNumber;
@@ -302,6 +286,8 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
       const minutes = punchOutMinutes - punchInMinutes;
       const seconds = punchOutSeconds - punchInSeconds;
 
+      
+
       // Ensure minutes and seconds are positive
       if (seconds < 0) {
         minutes -= 1;
@@ -316,6 +302,8 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
       console.log('getTimeDiff', `${hours}:${minutes}:${seconds}`)
       return { hours, minutes, seconds };
     }
+
+    
 // it's work properly
     for(var i = 0 ; i < records.length ; i+=2) {
       const recordDate = records[i].attendandanceDate;
@@ -340,6 +328,7 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
     }
 
     
+    const formattedTotalTimeDifference = `${totalHours} hours and ${totalMinutes} minutes`;
 
     console.log('totalHour', totalHours)
     console.log('totalMinutes', totalMinutes)
@@ -351,7 +340,7 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
       message: "Daily Time Differences",
       data: {
         dailyTimeDifferences,
-        total: `${totalHours} hours and ${totalMinutes} minutes`,
+    total: formattedTotalTimeDifference,
       },
     });
   } catch (error) {

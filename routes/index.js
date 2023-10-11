@@ -252,6 +252,26 @@ router.delete("/company/:empid", async (req, res) => {
 });
 
 
+router.get("/employeedates", async (req, res) => {
+  try {
+    // Use the `select` method to specify the fields you want to retrieve
+    const results = await employee.find().select("name mobileNo");
+    console.log("results", results);
+    
+    res.status(200).json({
+      statusCode: 200,
+      message: "Search results",
+      data: results,
+    });
+  } catch (error) {
+    // Handle any errors that occur during the process
+    res.status(500).json({
+      statusCode: 500,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
 
 
 module.exports = router;

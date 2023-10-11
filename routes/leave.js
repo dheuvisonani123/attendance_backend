@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const RequestLeave = require("../models/leave");
+const leave = require("../models/leave");
 
 // Create a new leave request
 router.post("/requestleave", async (req, res) => {
@@ -9,7 +9,7 @@ router.post("/requestleave", async (req, res) => {
     const { fromdate, todate, leavetype, reasonofleave } = req.body;
 
     // Create a new leave request using the RequestLeave model
-    const newLeaveRequest = new RequestLeave({
+    const newLeaveRequest = new leave({
       fromdate,
       todate,
       leavetype,
@@ -36,5 +36,24 @@ router.post("/requestleave", async (req, res) => {
 
 
 
-
+router.get("/getleave", async (req, res) => {
+    try {
+      // Fetch all leave requests from the database
+      const leaveRequests = await leave.find();
+  
+      res.status(200).json({
+        statusCode: 200,
+        message: "Leave requests fetched successfully",
+        leaveRequests: leaveRequests,
+      });
+    } catch (error) {
+      // Handle any errors that occur during the process
+      res.status(500).json({
+        statusCode: 500,
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  });
+  
 module.exports = router;

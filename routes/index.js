@@ -52,7 +52,7 @@ router.post("/company", async (req, res) => {
 });
 
 
-module.exports = router;
+
 
 router.get("/search/:mobileNumber", async (req, res) => {
   try {
@@ -160,7 +160,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-module.exports = router;
+
 
 
 

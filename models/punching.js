@@ -17,9 +17,10 @@ const punching = new Schema({
   mobileNo:{type: String},
   fromDate:{type: String},
   toDate:{type: String},
+  empid:{type: String},
   // date: { type: Date, default: Date.now },
   date: { type: Date},
-  name:{}
+  
   
 
   

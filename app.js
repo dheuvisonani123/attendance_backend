@@ -10,7 +10,7 @@ var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var empbankdetail = require("./routes/empbankdetail.js");
 var notes = require("./routes/notes.js");
-var requestleave = require("./routes/requestleave.JS");
+
 // var punching=require("./router/punching.js");
 var PunchinRouter = require("./routes/punching.js");
 var ChatRouter = require("./routes/chats.js");
@@ -39,7 +39,7 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/empbankdetail", empbankdetail);
 app.use("/notes", notes);
-app.use("/requestleave", requestleave);
+
 app.use("/punching", PunchinRouter);
 app.use("/chats", ChatRouter);
 app.use("/holiday", HolidaysRouter);

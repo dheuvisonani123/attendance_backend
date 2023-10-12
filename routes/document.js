@@ -18,6 +18,15 @@ router.post("/documents", async (req, res) => {
     }
   });
 
-
+  router.get("/documents", async (req, res) => {
+    try {
+      // Retrieve all documents from the database
+      const documents = await Document.find(); // Assuming you have a "Document" model
+  
+      res.status(200).json(documents);
+    } catch (error) {
+      res.status(500).json({ error: "An error occurred while retrieving documents." });
+    }
+  });
 
 module.exports = router;

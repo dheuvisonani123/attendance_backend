@@ -5,7 +5,7 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var cors = require("cors");
 var dbCollation = require("./db.js");
-
+var document =require("./routes/document.js");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var empbankdetail = require("./routes/empbankdetail.js");
@@ -43,6 +43,7 @@ app.use("/notes", notes);
 app.use("/leave",leave)
 app.use("/punching", PunchinRouter);
 app.use("/chats", ChatRouter);
+app.use("/document",document);
 app.use("/holiday", HolidaysRouter);
 app.use(cors(corsOptions));
 

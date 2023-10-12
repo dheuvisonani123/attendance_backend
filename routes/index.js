@@ -145,7 +145,8 @@ router.post("/login", async (req, res) => {
       email: user.email,
       password:user.password,
       mobileNo: user.mobileNo,
-      address: user.address
+      address: user.address,
+      empid:user.empid,
     });
 
     // Send the token as a response
@@ -153,7 +154,8 @@ router.post("/login", async (req, res) => {
       statusCode: 200,
       message: "User Authenticated",
       token: token,
-      mobileNo: user.mobileNo
+      mobileNo: user.mobileNo,
+      empid:user.empid
     });
   } catch (error) {
     res.status(500).json({ statusCode: 500, message: error.message });

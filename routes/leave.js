@@ -6,7 +6,7 @@ const leave = require("../models/leave");
 router.post("/requestleave", async (req, res) => {
   try {
     // Extract the leave request data from the request body
-    const { fromdate, todate, leavetype, reasonofleave } = req.body;
+    const { fromdate, todate, leavetype, reasonofleave , empid} = req.body;
 
     // Create a new leave request using the RequestLeave model
     const newLeaveRequest = new leave({
@@ -14,6 +14,7 @@ router.post("/requestleave", async (req, res) => {
       todate,
       leavetype,
       reasonofleave,
+      empid,
     });
 
     // Save the new leave request to the database

@@ -7,6 +7,7 @@ const leave= new Schema({
     todate:{type:String},
     leavetype:{type:String},
     reasonofleave:{type:String},
+    empid:{type:String},
   
 });
 

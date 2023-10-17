@@ -276,4 +276,10 @@ router.get("/employeedates", async (req, res) => {
 });
 
 
+//for profile photo
+
+
+
+
+
 module.exports = router;

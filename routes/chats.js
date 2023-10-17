@@ -6,11 +6,13 @@ const Chat = require("../models/chat");
 router.post("/adminchat", async (req, res) => {
   try {
     // Extract the chat message text frosm the request body
-    const { addchat } = req.body;
+    const { addchat, date, empid } = req.body;
 
     // Create a new chat message using the Chat model
     const newChatMessage = new Chat({
       addchat,
+      date,
+      empid,
     });
 
     // Save the new chat message to the database

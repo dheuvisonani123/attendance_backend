@@ -58,7 +58,7 @@ router.get("/getleave", async (req, res) => {
   });
 
  router.put('/leaverequest/empid', async (req, res) => {
-    const requestId = req.params.id;
+    const empid = req.params.empid;
     const status = req.body.status;
   
     try {

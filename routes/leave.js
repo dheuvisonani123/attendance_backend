@@ -57,24 +57,24 @@ router.get("/getleave", async (req, res) => {
     }
   });
 
- router.put('/leaverequest/empid', async (req, res) => {
-    const empid = req.params.empid;
-    const status = req.body.status;
+ router.put('/leaverequest/:empid', async (req, res) => {
   
     try {
-      const request = await leave.findById(empid);
+      const empid = req.params.empid;
+      const request = await leave.findOneAndUpdate(
+        { empid },
+        req.body,
+        
+      );
   
       if (!request) {
         return res.status(404).json({ message: 'Leave request not found' });
-      }
-  
-      if (status === 'approved' || status === 'rejected') {
-        request.status = status;
-        await request.save();
-        res.json(request);
-      } else {
-        res.status(400).json({ message: 'Invalid status. Use "approved" or "rejected".' });
-      }
+      }  
+      res.json({
+        statusCode: 200,
+        data: request,
+        message: "request approved"
+      })
     } catch (error) {
       res.status(500).json({ message: 'Server error' });
     }

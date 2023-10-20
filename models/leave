@@ -10,7 +10,7 @@ const leave= new Schema({
     empid:{type:String},
     status: {
         type: String,
-        enum: ['pending', 'approved', 'rejected'],
+        enum: [ 'approved', 'rejected'],
         default: 'pending',
       },
   

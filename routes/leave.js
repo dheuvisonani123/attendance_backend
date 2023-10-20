@@ -56,5 +56,28 @@ router.get("/getleave", async (req, res) => {
       });
     }
   });
+
+ router.put('/leaverequest/empid', async (req, res) => {
+    const requestId = req.params.id;
+    const status = req.body.status;
+  
+    try {
+      const request = await leave.findById(empid);
+  
+      if (!request) {
+        return res.status(404).json({ message: 'Leave request not found' });
+      }
+  
+      if (status === 'approved' || status === 'rejected') {
+        request.status = status;
+        await request.save();
+        res.json(request);
+      } else {
+        res.status(400).json({ message: 'Invalid status. Use "approved" or "rejected".' });
+      }
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
   
 module.exports = router;

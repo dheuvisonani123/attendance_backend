@@ -8,6 +8,11 @@ const leave= new Schema({
     leavetype:{type:String},
     reasonofleave:{type:String},
     empid:{type:String},
+    status: {
+        type: String,
+        enum: ['pending', 'approved', 'rejected'],
+        default: 'pending',
+      },
   
 });
 

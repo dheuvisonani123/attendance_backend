@@ -45,6 +45,7 @@ app.use("/punching", PunchinRouter);
 app.use("/chats", ChatRouter);
 app.use("/document",document);
 app.use("/holiday", HolidaysRouter);
+
 app.use(cors(corsOptions));
 
 // catch 404 and forward to error handler

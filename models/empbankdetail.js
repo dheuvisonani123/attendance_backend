@@ -6,6 +6,7 @@ const bankSchema = new Schema({
   holdername: { type: String },
   ifsccode:{type:Number},
   accountNumber: { type: Number },
+  empid:{type:String}
   
 });
 

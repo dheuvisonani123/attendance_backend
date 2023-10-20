@@ -23,6 +23,7 @@ router.post("/bank", async (req, res) => {
         bankName:req.body.bankName,
         ifsccode:req.body.ifsccode,
         holdername:req.body.holdername,
+        empid:req.body.empid,
 
         // Add other user details here
       });
@@ -36,6 +37,46 @@ router.post("/bank", async (req, res) => {
         message: "Successfully created user",
       });
     }
+  } catch (error) {
+    // Handle any errors that occur during the process
+    res.status(500).json({
+      statusCode: 500,
+      message: error.message,
+    });
+  }
+});
+
+
+
+
+router.put("/bank/:empid", async (req, res) => {
+  try {
+    // Find the user by their unique identifier, in this case, "userId"
+    const empid = req.params.empid;
+    const emp = await Empbankdetail.findOne({ _id: empid });
+
+    if (!emp) {
+      return res.status(404).json({
+        statusCode: 404,
+        message: "User not found",
+      });
+    }
+
+    // Update user information with the data from the request body
+    user.accountNumber = req.body.accountNumber || user.accountNumber;
+    user.bankName = req.body.bankName || user.bankName;
+    user.ifsccode = req.body.ifsccode || user.ifsccode;
+    user.holdername = req.body.holdername || user.holdername;
+    
+    // You can add other user details here that need to be updated
+
+    // Save the updated user to the database
+    await user.save();
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "User information updated successfully",
+    });
   } catch (error) {
     // Handle any errors that occur during the process
     res.status(500).json({

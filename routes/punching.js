@@ -265,7 +265,7 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
       statusCode: 200,
       message: "Daily Time Differences",
       data: {
-        dailyTimeDifferences,
+       dailyTimeDifferences: dailyTimeDifferences,
     total: formattedTotalTimeDifference,
       },
     });

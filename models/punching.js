@@ -20,7 +20,7 @@ const punching = new Schema({
   empid:{type: String},
   // date: { type: Date, default: Date.now },
   date: { type: Date},
-    presentabsent: {
+   presentabsent: {
         type: String,
         enum: [ 'present', 'absent'],
         default: 'absent',

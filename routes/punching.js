@@ -157,39 +157,7 @@ router.post("/attandance", async (req, res) => {
 //get api for
 
 
-router.get("/punchin/:mobileNumber", async (req, res) => {
-  try {
-    const mobileNumber = req.params.mobileNumber;
 
-    // Find the latest "Punch in" record for the provided mobile number
-    const latestPunchInRecord = await Punching.findOne({
-      mobileNo: mobileNumber,
-      status: "Punch in",
-    }).sort({ attendandanceDate: -1 });
-
-    let status = "Absent"; // Default status is "Absent"
-
-    if (latestPunchInRecord) {
-      status = "Present";
-    }
-
-    res.status(200).json({
-      statusCode: 200,
-      message: "Employee status",
-      data: {
-        mobileNumber: mobileNumber,
-        status: status,
-      },
-    });
-  } catch (error) {
-    // Handle any errors that occur during the process
-    res.status(500).json({
-      statusCode: 500,
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
-});
 
 //get practice
 
@@ -313,6 +281,61 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
 
 
 
+router.get("/attendance", async (req, res) => {
+  try {
+    const allRecords = await Punching.find();
+    
+    res.json({
+      statusCode: 200,
+      data: allRecords,
+      message: "Attendance records retrieved successfully.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      statusCode: 500,
+      message: error.message,
+    });
+  }
+});
+
+
+
+router.get("/attendance/count", async (req, res) => {
+  try {
+    const aggregationResult = await Punching.aggregate([
+      {
+        $group: {
+          _id: "$presentabsent",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    let attendanceCounts = {
+      present: 0,
+      absent: 0,
+    };
+
+    aggregationResult.forEach((result) => {
+      if (result._id === "present") {
+        attendanceCounts.present = result.count;
+      } else if (result._id === "absent") {
+        attendanceCounts.absent = result.count;
+      }
+    });
+
+    res.json({
+      statusCode: 200,
+      data: attendanceCounts,
+      message: "Attendance counts retrieved successfully.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      statusCode: 500,
+      message: error.message,
+    });
+  }
+});
 
 
 

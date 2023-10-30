@@ -20,14 +20,11 @@ const punching = new Schema({
   empid:{type: String},
   // date: { type: Date, default: Date.now },
   date: { type: Date},
-  
-  
-
-  
-  
-  
-  
-  
+    presentabsent: {
+        type: String,
+        enum: [ 'present', 'absent'],
+        default: 'absent',
+      },  
 });
 
 module.exports = mongoose.model("Punching", punching);

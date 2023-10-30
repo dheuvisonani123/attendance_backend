@@ -66,7 +66,9 @@ const punching = require("../models/punching");
 
 //get api
 
-router.get("/search/:mobileNumber", async (req, res) => {
+
+
+router.get("/empsearch/:mobileNumber", async (req, res) => {
   try {
     const mobileNumber = req.params.mobileNumber;
 
@@ -87,8 +89,6 @@ router.get("/search/:mobileNumber", async (req, res) => {
     });
   }
 });
-
-
 //   try {
 //     const mobileNo = req.params.mobileNo;
 
@@ -157,15 +157,39 @@ router.post("/attandance", async (req, res) => {
 //get api for
 
 
+router.get("/punchin/:mobileNumber", async (req, res) => {
+  try {
+    const mobileNumber = req.params.mobileNumber;
 
+    // Find the latest "Punch in" record for the provided mobile number
+    const latestPunchInRecord = await Punching.findOne({
+      mobileNo: mobileNumber,
+      status: "Punch in",
+    }).sort({ attendandanceDate: -1 });
 
+    let status = "Absent"; // Default status is "Absent"
 
+    if (latestPunchInRecord) {
+      status = "Present";
+    }
 
-
-
-
-
-
+    res.status(200).json({
+      statusCode: 200,
+      message: "Employee status",
+      data: {
+        mobileNumber: mobileNumber,
+        status: status,
+      },
+    });
+  } catch (error) {
+    // Handle any errors that occur during the process
+    res.status(500).json({
+      statusCode: 500,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
 
 //get practice
 
@@ -279,6 +303,13 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
   }
 });
 
+
+
+
+
+
+
+// Helper function to calculate time difference
 
 
 

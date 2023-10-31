@@ -68,12 +68,12 @@ const punching = require("../models/punching");
 
 
 
-router.get("/empsearch/:mobileNumber", async (req, res) => {
-  try {
-    const mobileNumber = req.params.mobileNumber;
 
-    // Use Mongoose to find records by mobile number
-    const results = await Punching.find({ mobileNo: mobileNumber });
+router.get("/punching/:mobileNo", async (req, res) => {
+  try {
+    const mobileNo = req.params.mobileNo;
+
+    const results = await punching.find({ mobileNo: mobileNo });
 
     res.status(200).json({
       statusCode: 200,
@@ -81,7 +81,6 @@ router.get("/empsearch/:mobileNumber", async (req, res) => {
       data: results,
     });
   } catch (error) {
-    // Handle any errors that occur during the process
     res.status(500).json({
       statusCode: 500,
       message: "Internal server error",
@@ -89,6 +88,7 @@ router.get("/empsearch/:mobileNumber", async (req, res) => {
     });
   }
 });
+
 //   try {
 //     const mobileNo = req.params.mobileNo;
 
@@ -300,34 +300,32 @@ router.get("/attendance", async (req, res) => {
 
 
 
-router.get("/attendance/count", async (req, res) => {
+router.get('/attendance/count', async (req, res) => {
   try {
-    const aggregationResult = await Punching.aggregate([
-      {
-        $group: {
-          _id: "$presentabsent",
-          count: { $sum: 1 },
-        },
-      },
-    ]);
+    // Get the date from the query parameter (e.g., /attendance/count?date=2023-10-30)
+    const dateParam = req.query.date;
 
+    // Find records in the database for the specified date
+    const records = await Punching.find({ "attendandanceDate": new Date(dateParam) });
+
+    // Count "present" and "absent" entries
     let attendanceCounts = {
       present: 0,
       absent: 0,
     };
 
-    aggregationResult.forEach((result) => {
-      if (result._id === "present") {
-        attendanceCounts.present = result.count;
-      } else if (result._id === "absent") {
-        attendanceCounts.absent = result.count;
+    records.forEach((record) => {
+      if (record.presentabsent === 'present') {
+        attendanceCounts.present++;
+      } else if (record.presentabsent === 'absent') {
+        attendanceCounts.absent++;
       }
     });
 
     res.json({
       statusCode: 200,
       data: attendanceCounts,
-      message: "Attendance counts retrieved successfully.",
+      message: 'Attendance counts retrieved successfully for the specified date.',
     });
   } catch (error) {
     res.status(500).json({
@@ -336,6 +334,9 @@ router.get("/attendance/count", async (req, res) => {
     });
   }
 });
+
+module.exports = router;
+
 
 
 

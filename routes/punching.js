@@ -302,8 +302,6 @@ router.get('/matching-mobiles/:date', async (req, res) => {
       statusCode: 200,
       message: `Mobile numbers present in both "employee" and "punching" collections for the date ${selectedDate.toISOString()}`,
       data: {
-        matchingMobiles: matchingMobiles,
-        mismatchedMobiles:mismatchedMobiles,
         present: present,
         absent:absent,
       },

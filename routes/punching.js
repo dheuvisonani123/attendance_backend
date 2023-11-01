@@ -184,12 +184,13 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
     let currentDay = null;
     let punchInTime = null;
 
+    console.log(dailyTimeDifferences,"")
     
     let totalHours = 0;
     let totalMinutes = 0;
     let totalSeconds = 0;
     
-    const getTimeDiffrence = (fromtime,totime) => {
+      const getTimeDifference = (fromtime,totime) => {
       const punchInTimeParts = fromtime.split(":");
       const punchOutTimeParts = totime.split(":");
       
@@ -219,8 +220,8 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
         minutes += 60;
       }
 
-      console.log('getTimeDiff', `${hours}:${minutes}:${seconds}`)
-      return { hours, minutes, seconds };
+      console.log('getTimeDifference', `${hours}:${minutes}:${seconds}`)
+      return { hours, minutes, seconds, };
     }
 
     
@@ -231,10 +232,14 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
       const status = records[i].status;
    
       if(status === 'Punch in' && records[i+1].status === 'Punch out' && records[i+1].attendandanceDate.toString().slice(0,10) === recordDate.toString().slice(0,10) ){
-        const timeDiffrence = getTimeDiffrence(recordTime, records[i+1].attendandanceTime);
-        totalHours += timeDiffrence.hours;
-        totalMinutes += timeDiffrence.minutes;
-        totalSeconds += timeDiffrence.seconds;
+        const timeDifference = getTimeDifference(recordTime, records[i + 1].attendandanceTime);
+        totalHours += timeDifference.hours;
+        totalMinutes += timeDifference.minutes;
+        totalSeconds += timeDifference.seconds;
+        dailyTimeDifferences.push({
+          date: recordDate,
+          timeDifference: `${timeDifference.hours} hours and ${timeDifference.minutes} minutes`,
+        });
       }
     }
 
@@ -260,7 +265,7 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
       message: "Daily Time Differences",
       data: {
        dailyTimeDifferences: dailyTimeDifferences,
-    total: formattedTotalTimeDifference,
+        total: formattedTotalTimeDifference,
       },
     });
   } catch (error) {
@@ -273,15 +278,7 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
   }
 });
 
-
-
-
-
-
-
 // Helper function to calculate time difference
-
-
 
 router.get("/attendance", async (req, res) => {
   try {
@@ -341,101 +338,7 @@ router.get('/attendance/count', async (req, res) => {
 
 
 
-router.get('/leave_count', async (req, res) => {
-  try {
-    // Get the date from the query parameter (e.g., /attendance/count?date=2023-10-30)
-    const dateParam = req.query.date;
 
-    // Function to validate and parse the date
-    const parseDate = (dateString) => {
-      const parsedDate = new Date(dateString);
-      return isNaN(parsedDate.getTime()) ? null : parsedDate;
-    }
-console.log("parseDate",parseDate)
-    // Attempt to parse the date in ISO format
-    let date = parseDate(dateParam);
-console.log("date",date)
-    if (!date) {
-      // If parsing in ISO format failed, try parsing in other common formats
-      date = parseDate(dateParam.replace(/-/g, '/')); // Replace hyphens with slashes
-    }
-
-    if (!date) {
-      return res.status(400).json({
-        statusCode: 400,
-        message: 'Invalid date format. Please provide a valid date in ISO format (YYYY-MM-DD).',
-      });
-    }
-
-    // Query the "punching" collection for all documents on the specified date
-    const punchingData = await Punching.find({ attendandanceDate: date });
-console.log("punchingData",punchingData)
-    // Calculate the absent count for each unique mobileNo
-    const absentCount = {};
-    punchingData.forEach((entry) => {
-      if (entry.presentabsent === 'absent') {
-        if (!absentCount[entry.mobileNo]) {
-          absentCount[entry.mobileNo] = 1;
-        } else {
-          absentCount[entry.mobileNo]++;
-        }
-      }
-    });
-console.log("absentCount",absentCount)
-    res.json({
-      statusCode: 200,
-      absentCount: absentCount,
-    });
-  } catch (error) {
-    res.status(500).json({
-      statusCode: 500,
-      message: error.message,
-    });
-  }
-});
-
-
-router.get('/absent_count', async (req, res) => {
-  try {
-    const dateParam = req.query.date;
-
-    // Parse the date from the query parameter (assuming dateParam is in the format 'YYYY-MM-DD')
-    const date = new Date(dateParam);
-
-    if (isNaN(date.getTime())) {
-      return res.status(400).json({
-        statusCode: 400,
-        message: 'Invalid date format. Please provide a valid date in ISO format (YYYY-MM-DD).',
-      });
-    }
-
-    // Find all employees from the "employee" collection
-    const employees = await Employee.find({}, 'mobileNo');
-
-    // Find Punch In records from the "punching" collection for the specified date
-    const punchInRecords = await Punching.find({
-      attendandanceDate: date,
-      status: 'Punch In',
-    }, 'mobileNo');
- console.log("punchInRecords",punchInRecords)
-    // Extract mobile numbers of employees who have punched in on the specified date
-    const punchedInMobileNumbers = punchInRecords.map(record => record.mobileNo);
-
-    // Filter employees who have not punched in on the specified date
-    const absentEmployees = employees.filter(employee => !punchedInMobileNumbers.includes(employee.mobileNo));
-
-    res.json({
-      statusCode: 200,
-      absentCount: absentEmployees.length,
-      absentEmployees: absentEmployees,
-    });
-  } catch (error) {
-    res.status(500).json({
-      statusCode: 500,
-      message: error.message,
-    });
-  }
-});
 module.exports = router;
 
 

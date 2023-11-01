@@ -280,22 +280,46 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
 
 // Helper function to calculate time difference
 
-router.get("/attendance", async (req, res) => {
+router.get('/matching-mobiles/:date', async (req, res) => {
   try {
-    const allRecords = await Punching.find();
-    
-    res.json({
+    const selectedDate = new Date(req.params.date);
+
+    // Find mobile numbers in the 'employee' collection
+    const employeeMobiles = await Employee.distinct('mobileNo');
+
+    // Find mobile numbers in the 'punching' collection for the selected date
+    const punchMobiles = await Punching.distinct('mobileNo', {
+      attendandanceDate: selectedDate,
+    });
+
+    // Find mobile numbers that are present in both collections
+    const matchingMobiles = employeeMobiles.filter((mobileNo) => punchMobiles.includes(mobileNo));
+
+    const mismatchedMobiles = employeeMobiles.filter((mobileNo) => !punchMobiles.includes(mobileNo));
+    const present = matchingMobiles.length;
+    const absent=mismatchedMobiles.length;
+    res.status(200).json({
       statusCode: 200,
-      data: allRecords,
-      message: "Attendance records retrieved successfully.",
+      message: `Mobile numbers present in both "employee" and "punching" collections for the date ${selectedDate.toISOString()}`,
+      data: {
+        matchingMobiles: matchingMobiles,
+        mismatchedMobiles:mismatchedMobiles,
+        present: present,
+        absent:absent,
+      },
     });
   } catch (error) {
+    console.error('Error:', error);
     res.status(500).json({
       statusCode: 500,
-      message: error.message,
+      message: 'Internal server error',
+      error: error.message,
     });
   }
 });
+
+
+
 
 
 
@@ -333,6 +357,50 @@ router.get('/attendance/count', async (req, res) => {
     });
   }
 });
+router.get('/mismatched-mobiles/:date', async (req, res) => {
+  try {
+    const selectedDate = new Date(req.params.date);
+
+    // Find mobile numbers in the 'employee' collection
+    const employees = await Employee.find({}, 'mobileNo'); // Only retrieve the 'mobileNo' field
+
+    // Find mobile numbers in the 'punching' collection for the selected date
+    const punchMobiles = await Punching.distinct('mobileNo', {
+      attendandanceDate: selectedDate,
+      status: 'Punch in',
+    });
+
+    // Find mobile numbers that are in employees but not in punch records
+    const mismatchedMobiles = employees
+      .map((employee) => employee.mobileNo)
+      .filter((mobileNo) => !punchMobiles.includes(mobileNo));
+
+
+      const matchingMobiles = employees
+     .map((employee) => employee.mobileNo)
+      .filter((mobileNo) => punchMobiles.includes(mobileNo));
+
+    res.status(200).json({
+      statusCode: 200,
+      message: 'Mobile numbers that do not match with Punch records for the specified date',
+      data: {
+        matchingMobiles: matchingMobiles,
+        mismatchedMobiles: mismatchedMobiles,
+        allEmployeeMobiles: employees.map((employee) => employee.mobileNo),
+        
+      },
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({
+      statusCode: 500,
+      message: 'Internal server error',
+      error: error.message,
+    });
+  }
+});
+
+
 
 
 

@@ -284,8 +284,8 @@ router.get('/matching-mobiles/:date', async (req, res) => {
   try {
     const selectedDate = new Date(req.params.date);
 
-    // Find mobile numbers in the 'employee' collection
-    const employeeMobiles = await Employee.distinct('mobileNo');
+    // Find mobile numbers and names in the 'employee' collection
+    const employees = await Employee.find({}, 'mobileNo name');
 
     // Find mobile numbers in the 'punching' collection for the selected date
     const punchMobiles = await Punching.distinct('mobileNo', {
@@ -293,17 +293,56 @@ router.get('/matching-mobiles/:date', async (req, res) => {
     });
 
     // Find mobile numbers that are present in both collections
-    const matchingMobiles = employeeMobiles.filter((mobileNo) => punchMobiles.includes(mobileNo));
+    const matchingEmployees = employees.filter((employee) => punchMobiles.includes(employee.mobileNo));
+    const mismatchedEmployees = employees.filter((employee) => !punchMobiles.includes(employee.mobileNo));
 
-    const mismatchedMobiles = employeeMobiles.filter((mobileNo) => !punchMobiles.includes(mobileNo));
-    const present = matchingMobiles.length;
-    const absent=mismatchedMobiles.length;
+    const presentData = matchingEmployees.map((employee) => ({
+      name: employee.name,
+      mobileNo: employee.mobileNo,
+    }));
+
+    const absentData = mismatchedEmployees.map((employee) => ({
+      name: employee.name,
+      mobileNo: employee.mobileNo,
+    }));
+
+    // Extract punch in and punch out times for present employees
+    const punchData = await Punching.find({
+      attendandanceDate: selectedDate,
+      mobileNo: { $in: matchingEmployees.map((employee) => employee.mobileNo) },
+    });
+
+    const presentWithAttendance = matchingEmployees.map((employee) => {
+      const employeePunchData = punchData.find((punch) => punch.mobileNo === employee.mobileNo);
+      if (employeePunchData) {
+        return {
+          name: employee.name,
+          mobileNo: employee.mobileNo,
+          punchIn: employeePunchData.attendandanceTime,
+          punchOut: punchData.find((punch) => punch.mobileNo === employee.mobileNo && punch.status === 'Punch Out')
+            ?.attendandanceTime,
+        };
+      }
+      return null;
+    });
+
+    const presentWithPunchTimes = presentWithAttendance.filter((employee) => employee !== null);
+
+    const present = presentWithPunchTimes.length;
+    const absent = absentData.length;
+
     res.status(200).json({
       statusCode: 200,
-      message: `Mobile numbers present in both "employee" and "punching" collections for the date ${selectedDate.toISOString()}`,
+      message: `Mobile numbers, names, and attendance times present in both "employee" and "punching" collections for the date ${selectedDate.toISOString()}`,
       data: {
-        present: present,
-        absent:absent,
+        present: {
+          count: present,
+          employees: presentWithPunchTimes,
+        },
+        absent: {
+          count: absent,
+          employees: absentData,
+        },
       },
     });
   } catch (error) {
@@ -315,6 +354,8 @@ router.get('/matching-mobiles/:date', async (req, res) => {
     });
   }
 });
+
+
 
 
 

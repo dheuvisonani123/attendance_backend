@@ -58,7 +58,6 @@ router.get("/getleave", async (req, res) => {
   });
 
  router.put('/leaverequest/:empid', async (req, res) => {
-  
     try {
       const empid = req.params.empid;
       const request = await leave.findOneAndUpdate(

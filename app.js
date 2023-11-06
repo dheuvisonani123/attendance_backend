@@ -10,7 +10,8 @@ var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var empbankdetail = require("./routes/empbankdetail.js");
 var notes = require("./routes/notes.js");
-var leave=require("./routes/leave.js")
+var leave=require("./routes/leave.js");
+var latecount=require("./routes/latecount.js");
 
 // var punching=require("./router/punching.js");
 var PunchinRouter = require("./routes/punching.js");
@@ -45,6 +46,7 @@ app.use("/punching", PunchinRouter);
 app.use("/chats", ChatRouter);
 app.use("/document",document);
 app.use("/holiday", HolidaysRouter);
+app.use("/latecount",latecount);
 
 app.use(cors(corsOptions));
 

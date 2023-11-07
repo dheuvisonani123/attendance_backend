@@ -9,10 +9,10 @@ const leave= new Schema({
     reasonofleave:{type:String},
     empid:{type:String},
     status: {
-        type: String,
-        enum: [ 'approved', 'rejected'],
-        default: 'pending',
-      },
+      type: String,
+      enum: ["approved", "rejected", "pending"], // Valid enum values
+      default: "pending",
+    },
   
 });
 

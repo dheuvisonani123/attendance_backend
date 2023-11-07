@@ -2,19 +2,21 @@ const express = require("express");
 const router = express.Router();
 const leave = require("../models/leave");
 
+
 // Create a new leave request
 router.post("/requestleave", async (req, res) => {
   try {
     // Extract the leave request data from the request body
-    const { fromdate, todate, leavetype, reasonofleave , empid} = req.body;
+    const { fromdate, todate, leavetype, reasonofleave, empid } = req.body;
 
-    // Create a new leave request using the RequestLeave model
+    // Create a new leave request using the Leave model
     const newLeaveRequest = new leave({
       fromdate,
       todate,
       leavetype,
       reasonofleave,
       empid,
+      // The "status" field will be set to the default value "pending"
     });
 
     // Save the new leave request to the database

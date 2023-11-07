@@ -358,10 +358,6 @@ router.get('/matching-mobiles/:date', async (req, res) => {
 
 
 
-
-
-
-
 router.get('/attendance/count', async (req, res) => {
   try {
     // Get the date from the query parameter (e.g., /attendance/count?date=2023-10-30)
@@ -396,6 +392,8 @@ router.get('/attendance/count', async (req, res) => {
     });
   }
 });
+
+
 router.get('/mismatched-mobiles/:date', async (req, res) => {
   try {
     const selectedDate = new Date(req.params.date);
@@ -438,12 +436,6 @@ router.get('/mismatched-mobiles/:date', async (req, res) => {
     });
   }
 });
-
-
-
-
-
-
 
 
 module.exports = router;

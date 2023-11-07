@@ -102,51 +102,66 @@ router.post('/latecounts', async (req, res) => {
 
   
 router.get('/latecoun/:date', async (req, res) => {
-    try {
-        const targetDate = new Date(req.params.date);
+  try {
+      const targetDate = new Date(req.params.date);
 
-        // Get all "punching" records with status "Punch In" for the specified date
-        const punchingRecords = await punching.find({
-            status: "Punch In",
-            attendandanceDate: targetDate,
-        });
+      // Get all "Punch In" and "Punch Out" records for the specified date
+      const punchingRecords = await punching.find({
+          $or: [
+              { status: "Punch In", attendandanceDate: targetDate },
+              { status: "Punch Out", attendandanceDate: targetDate },
+          ],
+      });
 
-        // Get the "punchintime" values from the "latecount" collection
-        const latecountPunchintimes = (await Latecount.find()).map((latecount) => latecount.punchintime);
+      // Get the "punchintime" values from the "latecount" collection
+      const latecountPunchintimes = (await Latecount.find()).map((latecount) => latecount.punchintime);
 
-        // Filter the "punching" records where "attendandanceTime" is not in the "latecountPunchintimes" array
-        const lateCounts = punchingRecords.filter((punchingRecord) => !latecountPunchintimes.includes(punchingRecord.attendandanceTime));
+      // Fetch employee names from the "Employee" collection
+      const employeeNames = await Employee.find({
+          mobileNo: { $in: punchingRecords.map((record) => record.mobileNo) },
+      });
 
-        const late = lateCounts.length;
+      // Create a mapping of mobile numbers to employee names
+      const mobileToNameMap = {};
+      employeeNames.forEach((employee) => {
+          mobileToNameMap[employee.mobileNo] = employee.name;
+      });
 
-        // Get employee names by matching "mobileNo" with "employee" collection
-        const employeeNames = await Employee.find({
-            mobileNo: { $in: punchingRecords.map((record) => record.mobileNo) },
-        });
+      // Combine the "Punch In" and "Punch Out" records with employee names
+      const combinedRecords = punchingRecords.map((attendanceRecord) => {
+          return {
+              status: attendanceRecord.status,
+              attendandanceTime: attendanceRecord.attendandanceTime,
+              name: mobileToNameMap[attendanceRecord.mobileNo] || "N/A",
+          };
+      });
 
-        // Combine the lateCounts with employee names based on "mobileNo" matching
-        const combinedRecords = lateCounts.map((lateRecord) => {
-            const matchingEmployee = employeeNames.find((employee) => employee.mobileNo === lateRecord.mobileNo);
-            return {
-                ...lateRecord.toObject(),
-                name: matchingEmployee ? matchingEmployee.name : "N/A",
-            };
-        });
+      const late = combinedRecords.filter((attendanceRecord) => {
+          if (attendanceRecord.status === "Punch In") {
+              return !latecountPunchintimes.includes(attendanceRecord.attendandanceTime);
+          }
+          return false;
+      }).length;
 
-        res.status(200).json({
-            statusCode: 200,
-            message: 'Latecount records retrieved successfully',
-            lateCounts: combinedRecords,
-            late: late,
-        });
-    } catch (error) {
-        res.status(500).json({
-            statusCode: 500,
-            message: 'Internal server error',
-            error: error.message,
-        });
-    }
+      res.status(200).json({
+          statusCode: 200,
+          message: 'Punch In and Punch Out records retrieved successfully',
+          attendanceRecords: combinedRecords,
+          late: late,
+      });
+  } catch (error) {
+      res.status(500).json({
+          statusCode: 500,
+          message: 'Internal server error',
+          error: error.message,
+      });
+  }
 });
+
+
+
+
+
 
 
    

@@ -184,13 +184,12 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
     let currentDay = null;
     let punchInTime = null;
 
-    console.log(dailyTimeDifferences,"")
     
     let totalHours = 0;
     let totalMinutes = 0;
     let totalSeconds = 0;
     
-      const getTimeDifference = (fromtime,totime) => {
+    const getTimeDiffrence = (fromtime,totime) => {
       const punchInTimeParts = fromtime.split(":");
       const punchOutTimeParts = totime.split(":");
       
@@ -220,8 +219,8 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
         minutes += 60;
       }
 
-      console.log('getTimeDifference', `${hours}:${minutes}:${seconds}`)
-      return { hours, minutes, seconds, };
+      console.log('getTimeDiff', `${hours}:${minutes}:${seconds}`)
+      return { hours, minutes, seconds };
     }
 
     
@@ -232,13 +231,14 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
       const status = records[i].status;
    
       if(status === 'Punch in' && records[i+1].status === 'Punch out' && records[i+1].attendandanceDate.toString().slice(0,10) === recordDate.toString().slice(0,10) ){
-        const timeDifference = getTimeDifference(recordTime, records[i + 1].attendandanceTime);
-        totalHours += timeDifference.hours;
-        totalMinutes += timeDifference.minutes;
-        totalSeconds += timeDifference.seconds;
+        const timeDiffrence = getTimeDiffrence(recordTime, records[i+1].attendandanceTime);
+        totalHours += timeDiffrence.hours;
+        totalMinutes += timeDiffrence.minutes;
+        totalSeconds += timeDiffrence.seconds;
+
         dailyTimeDifferences.push({
           date: recordDate,
-          timeDifference: `${timeDifference.hours} hours and ${timeDifference.minutes} minutes`,
+          difference: `${timeDiffrence.hours} hours and ${timeDiffrence.minutes} minutes`,
         });
       }
     }
@@ -265,7 +265,8 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
       message: "Daily Time Differences",
       data: {
        dailyTimeDifferences: dailyTimeDifferences,
-        total: formattedTotalTimeDifference,
+       total: formattedTotalTimeDifference,
+       
       },
     });
   } catch (error) {
@@ -277,6 +278,9 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
     });
   }
 });
+
+
+
 
 // Helper function to calculate time difference
 

@@ -71,34 +71,6 @@ router.post('/latecounts', async (req, res) => {
   });
   
 
-  router.get('/latecounts/:date', async (req, res) => {
-    try {
-        const selectedDate = new Date(req.params.date);
-      
-        // Count of "latecount" records where status is "Punch In" and attendandanceTime is not equal to 9:00 AM
-        const lateCount = await punching.countDocuments({
-            status: "Punch In",
-            attendandanceTime: { $ne: '09:00:00' },
-            attendandanceDate: selectedDate // Use the parsed date from the parameter
-        });
-
-        // Calculate the range format
-        const late = `${lateCount}`;
-
-        res.status(200).json({
-            statusCode: 200,
-            message: 'Count of matching records',
-            late,
-            selectedDate: selectedDate
-        });
-    } catch (error) {
-        res.status(500).json({
-            statusCode: 500,
-            message: 'Internal server error',
-            error: error.message,
-        });
-    }
-});
 
   
 router.get('/latecoun/:date', async (req, res) => {
@@ -115,7 +87,7 @@ router.get('/latecoun/:date', async (req, res) => {
 
       // Get the "punchintime" values from the "latecount" collection
       const latecountPunchintimes = (await Latecount.find()).map((latecount) => latecount.punchintime);
-
+console.log(latecountPunchintimes,"latecountPunchintimes")
       // Fetch employee names from the "Employee" collection
       const employeeNames = await Employee.find({
           mobileNo: { $in: punchingRecords.map((record) => record.mobileNo) },
@@ -142,12 +114,13 @@ router.get('/latecoun/:date', async (req, res) => {
           }
           return false;
       }).length;
-
+console.log(late,"late")
       res.status(200).json({
           statusCode: 200,
           message: 'Punch In and Punch Out records retrieved successfully',
           attendanceRecords: combinedRecords,
           late: late,
+          employeeNames:employeeNames,
       });
   } catch (error) {
       res.status(500).json({
@@ -156,7 +129,7 @@ router.get('/latecoun/:date', async (req, res) => {
           error: error.message,
       });
   }
-});
+});  
 
 
 

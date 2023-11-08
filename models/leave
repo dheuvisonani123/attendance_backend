@@ -8,6 +8,7 @@ const leave= new Schema({
     leavetype:{type:String},
     reasonofleave:{type:String},
     empid:{type:String},
+    applydate:{type:Date},
     status: {
       type: String,
       enum: ["approved", "rejected", "pending"], // Valid enum values

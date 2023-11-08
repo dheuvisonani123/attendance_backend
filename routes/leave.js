@@ -7,7 +7,7 @@ const leave = require("../models/leave");
 router.post("/requestleave", async (req, res) => {
   try {
     // Extract the leave request data from the request body
-    const { fromdate, todate, leavetype, reasonofleave, empid } = req.body;
+    const { fromdate, todate, leavetype, reasonofleave, empid ,applydate} = req.body;
 
     // Create a new leave request using the Leave model
     const newLeaveRequest = new leave({
@@ -16,6 +16,7 @@ router.post("/requestleave", async (req, res) => {
       leavetype,
       reasonofleave,
       empid,
+      applydate,
       // The "status" field will be set to the default value "pending"
     });
 

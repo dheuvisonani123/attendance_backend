@@ -6,67 +6,6 @@ const Employee = require('../models/employee');
 
 
 
-//   try {
-//     const { punchingdate, punchingtime, mobileNo,punchouttime,punchoutdate} = req.body;
-
-//     // Create a new leave request using the Punching model
-//     const newPunching = new Punching({
-//       punchingdate: punchingdate,
-//       punchingtime: punchingtime,
-//       mobileNo: mobileNo,
-//       punchoutdate:punchoutdate,
-//       punchOuttime:punchouttime,
-//     });
-
-//     // Save the new punching record to the database
-//     await newPunching.save();
-
-//     res.status(201).json({
-//       statusCode: 201,
-//       message: "Successfully created punching record",
-//     });
-//   } catch (error) {
-//     // Handle any errors that occur during the process
-//     res.status(500).json({
-//       statusCode: 500,
-//       message: "Internal server error",
-//       error: error.message,
-//     });
-//   }
-// });
-
-// router.post("/punching", async (req, res) => {
-//   try {
-//     const { punchingdate,status, punchingtime, mobileNo,punchoutdate ,punchOuttime} = req.body;
-
-//     // Create a new leave request using the Punching model
-//     const newPunching = new Punching({
-//       punchingdate: punchingdate,
-//       punchingtime: punchingtime,
-//       mobileNo: mobileNo,
-//       punchoutdate:punchoutdate,
-//       punchOuttime:punchOuttime,
-//       status:status
-//     });
-
-//     // Save the new punching record to the database
-//     await newPunching.save();
-
-//     res.status(201).json({
-//       statusCode: 201,
-//       message: "Successfully created punching record",
-//     });
-//   } catch (error) {
-//     // Handle any errors that occur during the process
-//     res.status(500).json({
-//       statusCode: 500,
-//       message: "Internal server error",
-//       error: error.message,
-//     });
-//   }
-// });
-
-//get api
 
 
 
@@ -365,75 +304,28 @@ router.get('/matching-mobiles/:date', async (req, res) => {
 });
 
 
-
-
-router.get('/attendance/count', async (req, res) => {
+router.get('/employee-punch-records/:mobileNo/:year/:month', async (req, res) => {
   try {
-    // Get the date from the query parameter (e.g., /attendance/count?date=2023-10-30)
-    const dateParam = req.query.date;
+    const { mobileNo, year, month } = req.params;
 
-    // Find records in the database for the specified date
-    const records = await Punching.find({ "attendandanceDate": new Date(dateParam) });
+    const firstDayOfMonth = new Date(year, month - 1, 1);
+    const lastDayOfMonth = new Date(year, month, 0, 23, 59, 59);
 
-    // Count "present" and "absent" entries
-    let attendanceCounts = {
-      present: 0,
-      absent: 0,
-    };
-
-    records.forEach((record) => {
-      if (record.presentabsent === 'present') {
-        attendanceCounts.present++;
-      } else if (record.presentabsent === 'absent') {
-        attendanceCounts.absent++;
-      }
+    const presentDays = await Punching.distinct('attendandanceDate', {
+      mobileNo,
+      attendandanceDate: { $gte: firstDayOfMonth, $lte: lastDayOfMonth },
+      status: 'Punch In',
     });
 
-    res.json({
-      statusCode: 200,
-      data: attendanceCounts,
-      message: 'Attendance counts retrieved successfully for the specified date.',
-    });
-  } catch (error) {
-    res.status(500).json({
-      statusCode: 500,
-      message: error.message,
-    });
-  }
-});
-
-
-router.get('/mismatched-mobiles/:date', async (req, res) => {
-  try {
-    const selectedDate = new Date(req.params.date);
-
-    // Find mobile numbers in the 'employee' collection
-    const employees = await Employee.find({}, 'mobileNo'); // Only retrieve the 'mobileNo' field
-
-    // Find mobile numbers in the 'punching' collection for the selected date
-    const punchMobiles = await Punching.distinct('mobileNo', {
-      attendandanceDate: selectedDate,
-      status: 'Punch in',
-    });
-
-    // Find mobile numbers that are in employees but not in punch records
-    const mismatchedMobiles = employees
-      .map((employee) => employee.mobileNo)
-      .filter((mobileNo) => !punchMobiles.includes(mobileNo));
-
-
-      const matchingMobiles = employees
-     .map((employee) => employee.mobileNo)
-      .filter((mobileNo) => punchMobiles.includes(mobileNo));
+    const totalDaysInMonth = new Date(year, month, 0).getDate();
+    const absentDays = totalDaysInMonth - presentDays.length;
 
     res.status(200).json({
       statusCode: 200,
-      message: 'Mobile numbers that do not match with Punch records for the specified date',
+      message: `Punch in records for ${mobileNo} in ${year}-${month}`,
       data: {
-        matchingMobiles: matchingMobiles,
-        mismatchedMobiles: mismatchedMobiles,
-        allEmployeeMobiles: employees.map((employee) => employee.mobileNo),
-        
+        presentDays: presentDays.length,
+        absentDays: absentDays,
       },
     });
   } catch (error) {
@@ -445,6 +337,17 @@ router.get('/mismatched-mobiles/:date', async (req, res) => {
     });
   }
 });
+
+
+
+
+
+
+
+
+
+
+
 
 
 module.exports = router;

@@ -4,39 +4,46 @@ const leave = require("../models/leave");
 
 
 // Create a new leave request
-router.post("/requestleave", async (req, res) => {
-  try {
-    // Extract the leave request data from the request body
-    const { fromdate, todate, leavetype, reasonofleave, empid ,applydate} = req.body;
+  router.post("/requestleave", async (req, res) => {
+   try {
+          // Extract the leave request data from the request body
+        const {
+            fromdate,
+            todate,
+            leavetype,
+            reasonofleave,
+            empid,
+            applydate,
+          } = req.body;
 
-    // Create a new leave request using the Leave model
-    const newLeaveRequest = new leave({
-      fromdate,
-      todate,
-      leavetype,
-      reasonofleave,
-      empid,
-      applydate,
-      // The "status" field will be set to the default value "pending"
-    });
+          // Create a new leave request using the Leave model
+          const newLeaveRequest = new leave({
+            fromdate,
+            todate,
+            leavetype,
+            reasonofleave,
+            empid,
+            applydate,
+            // The "status" field will be set to the default value "pending"
+          });
 
-    // Save the new leave request to the database
-    await newLeaveRequest.save();
+          // Save the new leave request to the database
+          await newLeaveRequest.save();
 
-    res.status(201).json({
-      statusCode: 201,
-      message: "Leave request created successfully",
-      leaveRequest: newLeaveRequest,
-    });
-  } catch (error) {
-    // Handle any errors that occur during the process
-    res.status(500).json({
-      statusCode: 500,
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
-});
+          res.status(201).json({
+            statusCode: 201,
+            message: "Leave request created successfully",
+            leaveRequest: newLeaveRequest,
+          });
+        } catch (error) {
+          // Handle any errors that occur during the process
+          res.status(500).json({
+            statusCode: 500,
+            message: "Internal server error",
+            error: error.message,
+          });
+        }
+      });
 
 
 
@@ -119,5 +126,43 @@ router.get("/getleave", async (req, res) => {
     }
 });
  
+router.get("/leavestats/:empid", async (req, res) => {
+  try {
+    // Extract the empid from the request parameters
+    const { empid } = req.params;
+
+    // Count the number of leave requests for each leave type
+    const privilegeLeaveCount = await leave.countDocuments({
+      empid,
+      leavetype: "Privileged leave",
+    });
+
+    const sickLeaveCount = await leave.countDocuments({
+      empid,
+      leavetype: "Sick Leave",
+    });
+
+    const casualLeaveCount = await leave.countDocuments({
+      empid,
+      leavetype: "casual",
+    });
+
+    // Return the leave statistics in the response
+    res.status(200).json({
+      statusCode: 200,
+      privilegeLeaveCount,
+      sickLeaveCount,
+      casualLeaveCount,
+    });
+  } catch (error) {
+    // Handle any errors that occur during the process
+    res.status(500).json({
+      statusCode: 500,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+
   
 module.exports = router;

@@ -75,10 +75,10 @@ router.post('/latecounts', async (req, res) => {
   
 router.get('/latecoun/:date', async (req, res) => {
   try {
-      const targetDate = new Date(req.params.date);
+    const targetDate = new Date(req.params.date);
 
       // Get all "Punch In" and "Punch Out" records for the specified date
-      const punchingRecords = await punching.find({
+    const punchingRecords = await punching.find({
           $or: [
               { status: "Punch In", attendandanceDate: targetDate },
               { status: "Punch Out", attendandanceDate: targetDate },
@@ -86,10 +86,10 @@ router.get('/latecoun/:date', async (req, res) => {
       });
 
       // Get the "punchintime" values from the "latecount" collection
-      const latecountPunchintimes = (await Latecount.find()).map((latecount) => latecount.punchintime);
+    const latecountPunchintimes = (await Latecount.find()).map((latecount) => latecount.punchintime);
 console.log(latecountPunchintimes,"latecountPunchintimes")
       // Fetch employee names from the "Employee" collection
-      const employeeNames = await Employee.find({
+    const employeeNames = await Employee.find({
           mobileNo: { $in: punchingRecords.map((record) => record.mobileNo) },
       });
 
@@ -131,13 +131,40 @@ console.log(late,"late")
   }
 });  
 
+router.get('/comparePunchTimes', async (req, res) => {
+  try {
+    
+    // Retrieve documents with punch-in status
+    const punchingDocs = await punching.find({ status: 'Punch In' });
+    console.log('Punching Documents:', punchingDocs);
+
+    // Specify the fixed punch-in time limit
+    const fixedPunchInTimeLimit = '10:00:00';
+
+    // Filter employees who punched in later than the fixed limit based on punch-in time
+    const lateEmployees = punchingDocs.filter((doc) => {
+      const punchInTime = doc.attendandanceTime;
+      return punchInTime < fixedPunchInTimeLimit;
+    });
+    console.log('Late Employees:', lateEmployees);
+    const totalLateEmployees = lateEmployees.length;
+    
+    res.json({ lateEmployees, totalLateEmployees });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 
 
 
 
 
-   
-  
+
+
+
+    
+
   
 module.exports = router;

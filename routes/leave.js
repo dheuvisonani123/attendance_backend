@@ -90,7 +90,7 @@ router.get("/getleave", async (req, res) => {
   });
 
 
-  router.get("/getleave/:empid", async (req, res) => {
+router.get("/getleave/:empid", async (req, res) => {
     try {
       // Get the empid parameter from the request query
       const empid = req.params.empid;

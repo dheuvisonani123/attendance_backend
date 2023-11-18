@@ -45,35 +45,28 @@ const leave = require("../models/leave");
         }
   });
 
-
-router.get("/getleave/:empid", async (req, res) => {
-  try {
-       const empid = req.params.empid;
-      
-          // Fetch leave requests for the specified empid from the database
-      const leaveRequests = await leave.find({ empid });
-      
-          // Calculate the total leave count
-      const totalLeaveCount = leaveRequests.length;
-      
-      res.status(200).json({
-      statusCode: 200,
-      message: "Leave requests fetched successfully",
-      empid: empid,
-      totalLeaveCount: totalLeaveCount,
-     leaveRequests: leaveRequests,
+  router.get('/leave-count/:empid/:month', async (req, res) => {
+    const { empid, month } = req.params;
+  
+    try {
+      const leaveCount = await leave.countDocuments({
+        empid,
+        $expr: {
+          $and: [
+            { $eq: [{ $month: '$applydate' }, parseInt(month)] },
+            { $eq: [{ $year: '$applydate' }, new Date().getFullYear()] }, // Assuming you want to compare the current year
+          ],
+        },
       });
-     }
-     catch (error) {
-          // Handle any errors that occur during the process
-        res.status(500).json({
-        statusCode: 500,
-        message: "Internal server error",
-        error: error.message,
-          });
-        }
-   });
-      
+  
+      res.json({ empid, month, leaveCount });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
+  
 
  router.put('/leaverequest/:empid', async (req, res) => {
     try {

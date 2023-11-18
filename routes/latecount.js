@@ -131,30 +131,49 @@ console.log(late,"late")
   }
 });  
 
-router.get('/comparePunchTimes', async (req, res) => {
+router.get('/compareLateCount', async (req, res) => {
   try {
+    // Retrieve punch-in records from the punching collection
+    const punchInRecords = await punching.find({ status: 'Punch In' });
     
-    // Retrieve documents with punch-in status
-    const punchingDocs = await punching.find({ status: 'Punch In' });
-    console.log('Punching Documents:', punchingDocs);
+    // Retrieve punch-in time limit from the latecount collection
+    const lateCount = await Latecount.findOne({});
+    const punchInTimeLimit = lateCount.punchintime;
 
-    // Specify the fixed punch-in time limit
-    const fixedPunchInTimeLimit = '10:00:00';
+    // Debug log to check the retrieved values
+    console.log('Punch In Records:', punchInRecords);
+    console.log('Punch In Time Limit:', punchInTimeLimit);
 
-    // Filter employees who punched in later than the fixed limit based on punch-in time
-    const lateEmployees = punchingDocs.filter((doc) => {
-      const punchInTime = doc.attendandanceTime;
-      return punchInTime < fixedPunchInTimeLimit;
+    // Filter late punch-in records
+    const latePunchInRecords = punchInRecords.filter((record) => {
+      const punchInTime = record.attendandanceTime;
+      console.log('Comparing Punch In Time:', punchInTime, 'with Limit:', punchInTimeLimit);
+      return punchInTime <= punchInTimeLimit;
     });
-    console.log('Late Employees:', lateEmployees);
-    const totalLateEmployees = lateEmployees.length;
-    
-    res.json({ lateEmployees, totalLateEmployees });
+
+    console.log('Late Punch In Records:', latePunchInRecords);
+
+    const totalLatePunchIns = latePunchInRecords.length;
+
+    res.status(200).json({
+      statusCode: 200,
+      message: 'Comparison of late punch-ins based on latecount punchintime',
+      data: {
+        totalLatePunchIns,
+        latePunchInRecords,
+      },
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error:', error);
+    res.status(500).json({
+      statusCode: 500,
+      message: 'Internal server error',
+      error: error.message,
+    });
   }
 });
+
+
 
 
 

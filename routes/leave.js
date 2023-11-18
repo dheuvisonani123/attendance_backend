@@ -147,12 +147,18 @@ router.get("/leavestats/:empid", async (req, res) => {
       leavetype: "casual",
     });
 
+    const paidleavecount = await leave.countDocuments({
+      empid,
+      leavetype: "paid Leave",
+    });
+
     // Return the leave statistics in the response
     res.status(200).json({
       statusCode: 200,
       privilegeLeaveCount,
       sickLeaveCount,
       casualLeaveCount,
+      paidleavecount,
     });
   } catch (error) {
     // Handle any errors that occur during the process

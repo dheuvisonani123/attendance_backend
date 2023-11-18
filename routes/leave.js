@@ -43,29 +43,37 @@ const leave = require("../models/leave");
             error: error.message,
           });
         }
-      });
+  });
 
 
-
-router.get("/getleave", async (req, res) => {
-    try {
-      // Fetch all leave requests from the database
-      const leaveRequests = await leave.find();
-  
+router.get("/getleave/:empid", async (req, res) => {
+  try {
+       const empid = req.params.empid;
+      
+          // Fetch leave requests for the specified empid from the database
+      const leaveRequests = await leave.find({ empid });
+      
+          // Calculate the total leave count
+      const totalLeaveCount = leaveRequests.length;
+      
       res.status(200).json({
-        statusCode: 200,
-        message: "Leave requests fetched successfully",
-        leaveRequests: leaveRequests,
+      statusCode: 200,
+      message: "Leave requests fetched successfully",
+      empid: empid,
+      totalLeaveCount: totalLeaveCount,
+     leaveRequests: leaveRequests,
       });
-    } catch (error) {
-      // Handle any errors that occur during the process
-      res.status(500).json({
+     }
+     catch (error) {
+          // Handle any errors that occur during the process
+        res.status(500).json({
         statusCode: 500,
         message: "Internal server error",
         error: error.message,
-      });
-    }
-  });
+          });
+        }
+   });
+      
 
  router.put('/leaverequest/:empid', async (req, res) => {
     try {

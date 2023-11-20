@@ -298,15 +298,17 @@ router.get('/employee-punch-records/:mobileNo/:year/:month', async (req, res) =>
     const { mobileNo, year, month } = req.params;
 
     const firstDayOfMonth = new Date(year, month - 1, 1);
-    const lastDayOfMonth = new Date(year, month, 0, 23, 59, 59);
+    const currentDate = new Date();
+    const lastDayOfMonth = new Date(year, month - 1, currentDate.getDate(), 23, 59, 59);
 
     const presentDays = await Punching.distinct('attendandanceDate', {
       mobileNo,
-      attendandanceDate: { $gte: firstDayOfMonth, $lte: lastDayOfMonth },
+      attendandanceDate: { $gte: firstDayOfMonth, $lte: currentDate }, // Updated condition
       status: 'Punch In',
     });
 
-    const totalDaysInMonth = new Date(year, month, 0).getDate();
+
+    const totalDaysInMonth = currentDate.getDate(); // Use the current date
     const absentDays = totalDaysInMonth - presentDays.length;
 
     res.status(200).json({
@@ -326,12 +328,6 @@ router.get('/employee-punch-records/:mobileNo/:year/:month', async (req, res) =>
     });
   }
 });
-
-
-
-
-
-
 
 
 

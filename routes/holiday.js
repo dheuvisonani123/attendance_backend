@@ -26,17 +26,31 @@ router.post("/holidays", async (req, res) => {
   }
 });
 
-router.get("/holidays", async (req, res) => {
-  try {
-    // Query the database to retrieve all holiday records
-    const holidays = await Holiday.find();
+router.get('/holidays/:year/:month', async (req, res) => {
+  const { year, month } = req.params;
 
-    // Respond with the list of holiday records
-    res.status(200).json(holidays);
+  try {
+    const totalHolidays = await Holiday.countDocuments({
+      date: {
+        $regex: new RegExp(`^${year}-${month}-`),
+      },
+    });
+
+    const filteredHolidays = await Holiday.find({
+      date: {
+        $regex: new RegExp(`^${year}-${month}-`),
+      },
+    });
+
+    res.json({ year, month, totalHolidays, holidays: filteredHolidays });
   } catch (error) {
-    // Handle any errors that occur during the process
     console.error(error);
-    res.status(500).json({ error: "An error occurred while fetching holiday records." });
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+
+
+
+
 module.exports = router;

@@ -3,6 +3,7 @@ const router = express.Router();
 const Punching = require("../models/punching");
 const punching = require("../models/punching");
 const Employee = require('../models/employee');
+const leave = require("../models/leave");
 
 
 
@@ -30,52 +31,6 @@ router.get("/punching/:mobileNo", async (req, res) => {
   }
 });
 
-//   try {
-//     const mobileNo = req.params.mobileNo;
-
-//     // Find the punching record for the given mobileNo
-//     const punchingRecord = await Punching.findOne({ mobileNo });
-//     console.log("punchingRecord", punchingRecord);
-
-//     if (!punchingRecord) {
-//       return res.status(404).json({ status: "error", message: "Punching record not found." });
-//     }
-
-//     // Extract the punching and punchout times from the record
-//     const { punchingdate, punchingtime, punchoutdate, punchOuttime,status } = punchingRecord;
-//     console.log("punchingRecord", punchingRecord);
-
-//     // Create Date objects from the timestamps
-//     const punchingTime = new Date(`${punchingdate}T${punchingtime}`);
-//     const punchOutTime = new Date(`${punchoutdate}T${punchOuttime}`);
-//     console.log("punchOutTime", punchOutTime);
-
-//     // Calculate the elapsed time in milliseconds
-//     const elapsedTimeMilliseconds = punchOutTime - punchingTime;
-
-//     // Calculate hours, minutes, and seconds from milliseconds
-//     const hours = Math.floor(elapsedTimeMilliseconds / (1000 * 60 * 60));
-//     const minutes = Math.floor((elapsedTimeMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
-//     const seconds = Math.floor((elapsedTimeMilliseconds % (1000 * 60)) / 1000);
-
-//     res.status(200).json({
-//       status: "success",
-//       elapsedTime: {
-//         hours,
-//         minutes,
-//         seconds,
-//       },
-//     });
-//   } catch (error) {
-//     // Handle any errors that occur during the process
-//     res.status(500).json({
-//       status: "error",
-//       statusCode: 500,
-//       message: "Internal server error",
-//       error: error.message,
-//     });
-//   }
-// });
 
 router.post("/attandance", async (req, res) => {
   try {
@@ -99,90 +54,6 @@ router.post("/attandance", async (req, res) => {
 
 
 
-
-//get practice
-router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
-  try {
-    const mobileNumber = req.params.mobileNumber;
-    const fromDate = new Date(req.params.fromDate);
-    const toDate = new Date(req.params.toDate);
-    console.log("mobileNumber", mobileNumber);
-    // Use Mongoose to find "Punch in" and "Punch out" records within the date range
-    const punchInRecords = await punching.find({
-      mobileNo: mobileNumber,
-      attendandanceDate: {
-        $gte: fromDate,
-        $lte: toDate,
-      },
-      status: "Punch in",
-    });
-    console.log("punchInRecords", punchInRecords);
-    const punchOutRecords = await punching.find({
-      mobileNo: mobileNumber,
-      attendandanceDate: {
-        $gte: fromDate,
-        $lte: toDate,
-      },
-      status: "Punch out",
-    });
-    console.log("punchOutRecords", punchOutRecords);
-    // Create an object to store total times for each day
-    const totalTimes = {};
-    // Iterate through "Punch in" records and calculate total times
-    for (const punchIn of punchInRecords) {
-      const punchOut = punchOutRecords.find(
-        (punchOut) =>
-          punchOut.mobileNo === punchIn.mobileNo &&
-          punchOut.attendandanceDate.toISOString() === punchIn.attendandanceDate.toISOString()
-      );
-      if (punchOut) {
-        const punchInTime = new Date(punchIn.attendandanceDate);
-        punchInTime.setHours(...punchIn.attendandanceTime.split(':'));
-        const punchOutTime = new Date(punchOut.attendandanceDate);
-        punchOutTime.setHours(...punchOut.attendandanceTime.split(':'));
-        // Calculate the time difference for the day in milliseconds
-        const timeDifference = punchOutTime - punchInTime;
-        // Add the time difference to the corresponding day's total
-        if (totalTimes[punchIn.attendandanceDate.toISOString()]) {
-          totalTimes[punchIn.attendandanceDate.toISOString()] += timeDifference;
-        } else {
-          totalTimes[punchIn.attendandanceDate.toISOString()] = timeDifference;
-        }
-      }
-    }
-    // Convert total times to hours, minutes, and seconds
-    const formattedTotalTimes = {};
-    let totalMillisecondsSum = 0;
-    for (const [date, timeDifference] of Object.entries(totalTimes)) {
-      const totalMilliseconds = timeDifference;
-      totalMillisecondsSum += totalMilliseconds;
-      const totalSeconds = Math.floor(totalMilliseconds / 1000);
-      const totalMinutes = Math.floor(totalSeconds / 60);
-      const totalHours = Math.floor(totalMinutes / 60);
-      formattedTotalTimes[date] = `${totalHours}:${totalMinutes % 60}:${totalSeconds % 60}`;
-    }
-    // Calculate the sum of all total times
-    const totalSecondsSum = Math.floor(totalMillisecondsSum / 1000);
-    const totalMinutesSum = Math.floor(totalSecondsSum / 60);
-    const totalHoursSum = Math.floor(totalMinutesSum / 60);
-    const formattedTotalSum = `${totalHoursSum}:${totalMinutesSum % 60}:${totalSecondsSum % 60}`;
-    res.status(200).json({
-      statusCode: 200,
-      message: "Total times between selected dates",
-      data: {
-        dailytimediffrence: formattedTotalTimes,
-        totaltime: formattedTotalSum,
-      },
-    });
-  } catch (error) {
-    console.error("Error:", error); // Log the error
-    res.status(500).json({
-      statusCode: 500,
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
-});
 
 
 
@@ -287,13 +158,18 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
     const totalSecondsSum = Math.floor(totalMillisecondsSum / 1000);
     const totalMinutesSum = Math.floor(totalSecondsSum / 60);
     const totalHoursSum = Math.floor(totalMinutesSum / 60);
-    const formattedTotalSum = `${totalHoursSum}:${totalMinutesSum % 60}:${totalSecondsSum % 60}`;
+    const totalHours = `${totalHoursSum}:${totalMinutesSum % 60}:${totalSecondsSum % 60}`;
+    const oneDay = 24 * 60 * 60 * 1000;
+    const totalDays = Math.round(Math.abs((toDate - fromDate) / oneDay)) + 1;
+    
     res.status(200).json({
       statusCode: 200,
       message: "Total times between selected dates",
       data: {
         individualTotals: formattedTotalTimes,
-        totalSum: formattedTotalSum,
+        totalHours: totalHours,
+        totalDays:totalDays,
+        
       },
     });
   } catch (error) {
@@ -309,7 +185,7 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
 
 
 
-// Helper function to calculate time difference
+
 
 router.get('/matching-mobiles/:date', async (req, res) => {
   try {

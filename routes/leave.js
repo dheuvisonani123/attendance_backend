@@ -90,7 +90,7 @@ const leave = require("../models/leave");
     }
   });
 
-
+//approved leave or reject leave
 router.get("/getleave/:empid", async (req, res) => {
     try {
       // Get the empid parameter from the request query

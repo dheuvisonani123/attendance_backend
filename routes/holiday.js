@@ -26,6 +26,28 @@ router.post("/holidays", async (req, res) => {
   }
 });
 
+
+
+router.get("/holidays", async (req, res) => {
+  try {
+    // Fetch all holiday records from the database
+    const holidays = await Holiday.find();
+
+    // Respond with the array of holiday records
+    res.status(200).json({
+      statusCode: 200,
+      message: "Holiday records retrieved successfully",
+      holidays: holidays,
+    });
+  } catch (error) {
+    // Handle any errors that occur during the process
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching holiday records." });
+  }
+});
+
 router.get('/holidays/:year/:month', async (req, res) => {
   const { year, month } = req.params;
 

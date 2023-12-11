@@ -73,63 +73,74 @@ router.post('/latecounts', async (req, res) => {
 
 
   
-router.get('/latecoun/:date', async (req, res) => {
-  try {
-    const targetDate = new Date(req.params.date);
+  router.get('/latecoun/:date', async (req, res) => {
+    try {
+        const targetDate = new Date(req.params.date);
+        const nextDate = new Date(targetDate);
+        nextDate.setDate(targetDate.getDate() + 1); // Get records until the next day
 
-      // Get all "Punch In" and "Punch Out" records for the specified date
-    const punchingRecords = await punching.find({
-          $or: [
-              { status: "Punch In", attendandanceDate: targetDate },
-              { status: "Punch Out", attendandanceDate: targetDate },
-          ],
-      });
+        // Get all "Punch In" records for the specified date
+        const punchingRecords = await punching.find({
+            status: "Punch in",
+            attendandanceDate: {
+                $gte: targetDate,
+                $lt: nextDate,
+            },
+        });
 
-      // Get the "punchintime" values from the "latecount" collection
-    const latecountPunchintimes = (await Latecount.find()).map((latecount) => latecount.punchintime);
-console.log(latecountPunchintimes,"latecountPunchintimes")
-      // Fetch employee names from the "Employee" collection
-    const employeeNames = await Employee.find({
-          mobileNo: { $in: punchingRecords.map((record) => record.mobileNo) },
-      });
+        console.log("punchingRecords", punchingRecords);
 
-      // Create a mapping of mobile numbers to employee names
-      const mobileToNameMap = {};
-      employeeNames.forEach((employee) => {
-          mobileToNameMap[employee.mobileNo] = employee.name;
-      });
+        // Filter "Punch In" records with punch in time after 9 AM
+        const latePunchInRecords = punchingRecords.filter((record) => {
+            const punchInDateTime = new Date(record.attendandanceDate);
+            punchInDateTime.setHours(...record.attendandanceTime.split(':').map(Number));
 
-      // Combine the "Punch In" and "Punch Out" records with employee names
-      const combinedRecords = punchingRecords.map((attendanceRecord) => {
-          return {
-              status: attendanceRecord.status,
-              attendandanceTime: attendanceRecord.attendandanceTime,
-              name: mobileToNameMap[attendanceRecord.mobileNo] || "N/A",
-          };
-      });
+            return punchInDateTime > new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 9, 0, 0, 0);
+        });
 
-      const late = combinedRecords.filter((attendanceRecord) => {
-          if (attendanceRecord.status === "Punch In") {
-              return !latecountPunchintimes.includes(attendanceRecord.attendandanceTime);
-          }
-          return false;
-      }).length;
-console.log(late,"late")
-      res.status(200).json({
-          statusCode: 200,
-          message: 'Punch In and Punch Out records retrieved successfully',
-          attendanceRecords: combinedRecords,
-          late: late,
-          employeeNames:employeeNames,
-      });
-  } catch (error) {
-      res.status(500).json({
-          statusCode: 500,
-          message: 'Internal server error',
-          error: error.message,
-      });
-  }
-});  
+        // Fetch employee names from the "Employee" collection
+        const employeeNames = await Employee.find({
+            mobileNo: { $in: latePunchInRecords.map((record) => record.mobileNo) },
+        });
+
+        // Create a mapping of mobile numbers to employee names
+        const mobileToNameMap = {};
+        employeeNames.forEach((employee) => {
+            mobileToNameMap[employee.mobileNo] = employee.name;
+        });
+
+        // Combine the "Punch In" records with employee names
+        const combinedRecords = latePunchInRecords.map((attendanceRecord) => {
+            return {
+                status: attendanceRecord.status,
+                attendandanceTime: attendanceRecord.attendandanceTime,
+                name: mobileToNameMap[attendanceRecord.mobileNo] || "N/A",
+            };
+        });
+
+        // Count of late entries for the specific date
+        const lateCount = combinedRecords.length;
+
+        res.status(200).json({
+            statusCode: 200,
+            message: 'Punch In records retrieved successfully',
+            attendanceRecords: combinedRecords,
+            lateCount: lateCount,
+        });
+    } catch (error) {
+        // Log the error for debugging
+        console.error(error);
+
+        res.status(500).json({
+            statusCode: 500,
+            message: 'Internal server error',
+            error: error.message,
+        });
+    }
+});
+
+
+
 
 router.get('/compareLateCount', async (req, res) => {
   try {
@@ -148,7 +159,7 @@ router.get('/compareLateCount', async (req, res) => {
     const latePunchInRecords = punchInRecords.filter((record) => {
       const punchInTime = record.attendandanceTime;
       console.log('Comparing Punch In Time:', punchInTime, 'with Limit:', punchInTimeLimit);
-      return punchInTime <= punchInTimeLimit;
+      return punchInTime < punchInTimeLimit;
     });
 
     console.log('Late Punch In Records:', latePunchInRecords);
@@ -173,17 +184,7 @@ router.get('/compareLateCount', async (req, res) => {
   }
 });
 
-
-
-
-
-
-
-
-
-
-
-    
+   
 
   
 module.exports = router;

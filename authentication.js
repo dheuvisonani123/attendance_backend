@@ -37,7 +37,7 @@ var createToken = async ({
     },
     SECRET_KEY,
     {
-      expiresIn: "120h",
+      expiresIn: "500h",
     }
   );
   return token;

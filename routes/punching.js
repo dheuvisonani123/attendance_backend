@@ -4,7 +4,7 @@ const Punching = require("../models/punching");
 const punching = require("../models/punching");
 const Employee = require('../models/employee');
 const leave = require("../models/leave");
-
+const Latecount = require("../models/latecount");
 
 
 
@@ -184,6 +184,7 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
 
 
 
+    
 
 
 

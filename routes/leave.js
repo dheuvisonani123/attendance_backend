@@ -66,7 +66,27 @@ const leave = require("../models/leave");
     }
   });
   
-  
+  // Assuming you have a route like "/getleave" for fetching leave requests
+router.get("/getleave", async (req, res) => {
+  try {
+    // Fetch all leave requests from the database
+    const leaveRequests = await leave.find();
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Leave requests retrieved successfully",
+      leaveRequests: leaveRequests,
+    });
+  } catch (error) {
+    // Handle any errors that occur during the process
+    res.status(500).json({
+      statusCode: 500,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+
 
  router.put('/leaverequest/:empid', async (req, res) => {
     try {

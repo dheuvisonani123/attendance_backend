@@ -191,35 +191,29 @@ router.get("/attandance/:mobileNumber/:fromDate/:toDate", async (req, res) => {
 router.get('/matching-mobiles/:date', async (req, res) => {
   try {
     const selectedDate = new Date(req.params.date);
-
     // Find mobile numbers and names in the 'employee' collection
     const employees = await Employee.find({}, 'mobileNo name');
-
     // Find mobile numbers in the 'punching' collection for the selected date
     const punchMobiles = await Punching.distinct('mobileNo', {
       attendandanceDate: selectedDate,
     });
-
+    
     // Find mobile numbers that are present in both collections
     const matchingEmployees = employees.filter((employee) => punchMobiles.includes(employee.mobileNo));
     const mismatchedEmployees = employees.filter((employee) => !punchMobiles.includes(employee.mobileNo));
-
     const presentData = matchingEmployees.map((employee) => ({
       name: employee.name,
       mobileNo: employee.mobileNo,
     }));
-
     const absentData = mismatchedEmployees.map((employee) => ({
       name: employee.name,
       mobileNo: employee.mobileNo,
     }));
-
     // Extract punch in and punch out times for present employees
     const punchData = await Punching.find({
       attendandanceDate: selectedDate,
       mobileNo: { $in: matchingEmployees.map((employee) => employee.mobileNo) },
     });
-
     const presentWithAttendance = matchingEmployees.map((employee) => {
       const employeePunchData = punchData.find((punch) => punch.mobileNo === employee.mobileNo);
       if (employeePunchData) {
@@ -233,12 +227,9 @@ router.get('/matching-mobiles/:date', async (req, res) => {
       }
       return null;
     });
-
     const presentWithPunchTimes = presentWithAttendance.filter((employee) => employee !== null);
-
     const present = presentWithPunchTimes.length;
     const absent = absentData.length;
-
     res.status(200).json({
       statusCode: 200,
       message: `Mobile numbers, names, and attendance times present in both "employee" and "punching" collections for the date ${selectedDate.toISOString()}`,
@@ -246,10 +237,12 @@ router.get('/matching-mobiles/:date', async (req, res) => {
         present: {
           count: present,
           employees: presentWithPunchTimes,
+          presentData:presentData,
         },
         absent: {
           count: absent,
           employees: absentData,
+       
         },
       },
     });
@@ -262,6 +255,7 @@ router.get('/matching-mobiles/:date', async (req, res) => {
     });
   }
 });
+
 
 
 router.get('/employee-punch-records/:mobileNo/:year/:month', async (req, res) => {

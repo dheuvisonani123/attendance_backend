@@ -17,6 +17,7 @@ var latecount=require("./routes/latecount.js");
 var PunchinRouter = require("./routes/punching.js");
 var ChatRouter = require("./routes/chats.js");
 var HolidaysRouter = require("./routes/holiday.js");
+var salarySchema = require("./models/salary.js");
 
 const corsOptions = {
   origin: "https://attendance-backend-dr959e53v-dheuvisonani123.vercel.app/", // Replace with the actual origin of your frontend
@@ -47,6 +48,7 @@ app.use("/chats", ChatRouter);
 app.use("/document",document);
 app.use("/holiday", HolidaysRouter);
 app.use("/latecount",latecount);
+app.use("/salary",salarySchema);
 
 app.use(cors(corsOptions));
 

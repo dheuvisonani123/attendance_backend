@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const salarySchema = new Schema({
+const salary= new Schema({
   
-  empid:{type: String},
-  salary:{type:Number},
-     
+empid:{type: String},
+salary:{type: Number},
+    
 });
 
-module.exports = mongoose.model("salary", salarySchema);
+module.exports = mongoose.model("salary", salary);

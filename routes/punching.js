@@ -197,7 +197,7 @@ router.get('/matching-mobiles/:date', async (req, res) => {
     const punchMobiles = await Punching.distinct('mobileNo', {
       attendandanceDate: selectedDate,
     });
-    
+    console.log
     // Find mobile numbers that are present in both collections
     const matchingEmployees = employees.filter((employee) => punchMobiles.includes(employee.mobileNo));
     const mismatchedEmployees = employees.filter((employee) => !punchMobiles.includes(employee.mobileNo));
@@ -261,21 +261,16 @@ router.get('/matching-mobiles/:date', async (req, res) => {
 router.get('/employee-punch-records/:mobileNo/:year/:month', async (req, res) => {
   try {
     const { mobileNo, year, month } = req.params;
-
     const firstDayOfMonth = new Date(year, month - 1, 1);
     const currentDate = new Date();
     const lastDayOfMonth = new Date(year, month - 1, currentDate.getDate(), 23, 59, 59);
-
     const presentDays = await Punching.distinct('attendandanceDate', {
       mobileNo,
       attendandanceDate: { $gte: firstDayOfMonth, $lte: currentDate }, // Updated condition
-      status: 'Punch In',
+      status: 'Punch in',
     });
-
-
     const totalDaysInMonth = currentDate.getDate(); // Use the current date
     const absentDays = totalDaysInMonth - presentDays.length;
-
     res.status(200).json({
       statusCode: 200,
       message: `Punch in records for ${mobileNo} in ${year}-${month}`,

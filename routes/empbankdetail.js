@@ -47,7 +47,24 @@ router.post("/bank", async (req, res) => {
 });
 
 
+router.get("/bank", async (req, res) => {
+  try {
+    // Retrieve all users from the database
+    const allUsers = await Empbankdetail.find();
 
+    // Return the array of user data
+    res.status(200).json({
+      statusCode: 200,
+      data: allUsers,
+    });
+  } catch (error) {
+    // Handle any errors that occur during the process
+    res.status(500).json({
+      statusCode: 500,
+      message: error.message,
+    });
+  }
+});
 
 router.put("/bank/:empid", async (req, res) => {
   try {

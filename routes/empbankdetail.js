@@ -68,11 +68,11 @@ router.get("/bank", async (req, res) => {
 
 router.put("/bank/:empid", async (req, res) => {
   try {
-    // Find the user by their unique identifier, in this case, "userId"
+    // Find the user by their unique identifier, in this case, "empid"
     const empid = req.params.empid;
-    const emp = await Empbankdetail.findOne({ _id: empid });
+    const user = await Empbankdetail.findOne({ empid: empid });
 
-    if (!emp) {
+    if (!user) {
       return res.status(404).json({
         statusCode: 404,
         message: "User not found",
@@ -84,7 +84,7 @@ router.put("/bank/:empid", async (req, res) => {
     user.bankName = req.body.bankName || user.bankName;
     user.ifsccode = req.body.ifsccode || user.ifsccode;
     user.holdername = req.body.holdername || user.holdername;
-    
+
     // You can add other user details here that need to be updated
 
     // Save the updated user to the database
@@ -102,5 +102,6 @@ router.put("/bank/:empid", async (req, res) => {
     });
   }
 });
+
 
 module.exports = router;

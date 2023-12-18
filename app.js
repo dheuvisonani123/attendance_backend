@@ -17,7 +17,7 @@ var salary=require("./routes/salary.js");
 var PunchinRouter = require("./routes/punching.js");
 var ChatRouter = require("./routes/chats.js");
 var HolidaysRouter = require("./routes/holiday.js");
-
+var attendance =require("./routes/attendance.js");
 const corsOptions = {
   origin: "https://attendance-backend-dr959e53v-dheuvisonani123.vercel.app/", // Replace with the actual origin of your frontend
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE", // Add the HTTP methods your API supports
@@ -48,7 +48,7 @@ app.use("/document",document);
 app.use("/holiday", HolidaysRouter);
 app.use("/latecount",latecount);
 app.use("/salary",salary);
-
+app.use("/attendance",attendance);
 app.use(cors(corsOptions));
 
 // catch 404 and forward to error handler

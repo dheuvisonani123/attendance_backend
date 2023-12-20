@@ -3,8 +3,6 @@ const router = express.Router();
 const salary=require("../models/salary");
 
 
-
-
 router.post("/salary", async (req, res) => {
     try {
       
@@ -42,6 +40,8 @@ router.post("/salary", async (req, res) => {
       });
     }   
   });
+
+
 
   router.put("/salary/:empid", async (req, res) => {
     try {

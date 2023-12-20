@@ -88,8 +88,6 @@ router.post('/latecounts', async (req, res) => {
             },
         });
 
-        console.log("punchingRecords", punchingRecords);
-
         // Filter "Punch In" records with punch in time after 9 AM
         const latePunchInRecords = punchingRecords.filter((record) => {
             const punchInDateTime = new Date(record.attendandanceDate);
@@ -138,7 +136,6 @@ router.post('/latecounts', async (req, res) => {
         });
     }
 });
-
 
 
 

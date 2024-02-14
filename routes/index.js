@@ -192,6 +192,32 @@ console.log("results",results)
 });
 
 
+router.get("/emp", async (req, res) => {
+  try {
+    const results = await employee.find();
+    const totalEmployees = await employee.countDocuments(); // Counting the number of documents
+    console.log("results", results);
+    res.status(200).json({
+      statusCode: 200,
+      message: "Search results",
+      totalEmployees: totalEmployees, // Adding totalEmployees to the response
+      data: results,
+    });
+  } catch (error) {
+    // Handle any errors that occur during the process
+    res.status(500).json({
+      statusCode: 500,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+console.log("totalEmployees",totalEmployees)
+
+
+
+
+
 //update user
 router.put("/company/:empid", async (req, res) => {
   try {
